@@ -8,7 +8,6 @@ public class PathTraveller
     private int wayPointIndex = 1;
 
 
-
     public void Set(Path path)
     {
         wayPointIndex = 1;
@@ -26,7 +25,10 @@ public class PathTraveller
     {
         if (path == null || wayPointIndex >= path.Count) return currentPostion;
 
-        var newPosition = Vector2.MoveTowards(currentPostion, path[wayPointIndex], speed);
+        Vector2 newPosition = currentPostion;
+
+        newPosition.x = Mathf.MoveTowards(currentPostion.x, path[wayPointIndex].x, speed);
+        newPosition.y = Mathf.MoveTowards(currentPostion.y, path[wayPointIndex].y, speed);
 
         if (Vector2.Distance(newPosition, path[wayPointIndex]) < 0.0001)
         {

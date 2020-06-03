@@ -17,7 +17,6 @@ public class Agent : MonoBehaviour
 
     private PathFinder pathFinder = new PathFinder();
     private PathTraveller pathTraveller = new PathTraveller(); 
-    private Path currentPath;
 
 
     private void Start()
@@ -66,37 +65,48 @@ public class Agent : MonoBehaviour
 
     public bool CalculatePath(Vector2 destination,out Path path)
     {
+        if (Map == null)
+        {
+            path = null;
+            return false;
+        }
+
         var start = Map.GetNode(transform.position);
         var goal = Map.GetNode(destination);
 
         //Check if the goal is valide
         if (goal != null)
         {
-            if(pathFinder.TryGetPath(start, goal, Map, out List<Vector2> newPath, maxJumpHeight))
+            if (pathFinder.TryGetPath(start, goal, Map, out List<Vector2> newPath, maxJumpHeight))
             {
                 Debug.Log($"Path found for agent: <i>{name}</i> from {start.GetNodeCenter()} to {goal.GetNodeCenter()}");
                 path = new Path(newPath);
                 return true;
             }
         }
-        Debug.Log($"Path not found for agent: <i>{name}</i> from {start.GetNodeCenter()} to {goal.GetNodeCenter()}");
+        else
+        {
+            Debug.Log($"Path not found for agent: <i>{name}</i> from {start.GetNodeCenter()} to {goal}");
+        }
         path = null;
         return false;
     }
 
     public void SetDestination(Vector2 destination)
     {
-        if (CalculatePath(destination, out currentPath))
+        if (CalculatePath(destination, out Path path))
         {
-            pathTraveller.Set(currentPath);
+            pathTraveller.Set(path);
             HasPath = true;
         }
     }
 
     private void OnDrawGizmos()
     {
-        if (currentPath == null) return;
+        if (pathTraveller == null) return;
 
+        var currentPath = pathTraveller.Get();
+        if (currentPath == null) return;
 
         Gizmos.color = Color.blue;
         for (int i = 0; i < currentPath.Count - 1; i++)
@@ -107,17 +117,6 @@ public class Agent : MonoBehaviour
             Gizmos.DrawCube(to, Vector2.one * 0.1f);
         }
 
-        if(pathFinder != null && pathFinder.serachPoints != null)
-        {
-            var serachPoints = pathFinder.serachPoints;
-
-            for (int i = 0; i < serachPoints.Count; i++)
-            {
-                var factor = (float)i / serachPoints.Count;
-                Gizmos.color = Color.Lerp(Color.green,Color.red, factor);
-                Gizmos.DrawCube(serachPoints[i], Vector3.one * Mathf.Lerp(0.3f,0.6f, factor));
-            }
-        }
-
+        pathFinder.DrawLastSearchLocation();
     }
 }

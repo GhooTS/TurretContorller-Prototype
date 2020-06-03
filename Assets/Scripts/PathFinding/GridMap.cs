@@ -61,7 +61,7 @@ public class GridMap : MonoBehaviour
             if (IsValideIndex(IndexVector.x, IndexVector.y - 1) && nodes[IndexVector.x, IndexVector.y - 1].type != Node.NodeType.wall)
                 output.Add(nodes[IndexVector.x, IndexVector.y - 1]);
 
-            if (verticalMoveDirection >= 0)
+            if (verticalMoveDirection > 0)
             {
 
                 if (IsValideIndex(IndexVector.x + 1, IndexVector.y) && nodes[IndexVector.x + 1, IndexVector.y].type == Node.NodeType.walkable)
@@ -112,18 +112,6 @@ public class GridMap : MonoBehaviour
     public Vector2 GetClosesPoint(Vector2 position)
     {
         return mapBounds.ClosestPoint(position);
-    }
-
-    public bool TryGetNode(Vector2Int indexes,out Node node)
-    {
-        if(IsValideIndex(indexes.x, indexes.y))
-        {
-            node = nodes[indexes.x, indexes.y];
-            return true;
-        }
-
-        node = null;
-        return false;
     }
 
     public Node GetNode(Vector2 position)

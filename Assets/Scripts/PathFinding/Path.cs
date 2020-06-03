@@ -19,15 +19,21 @@ public class Path
     {
         this.wayPoints = wayPoints;
         PathLenght = 0;
+
         for (int i = 1; i < wayPoints.Count; i++)
         {
             PathLenght += Mathf.Abs(wayPoints[i].x - wayPoints[i - 1].x);
         }
     }
 
+
     public bool IsBetween(int index,Vector2 point)
     {
-        return wayPoints[index].x <= point.x && wayPoints[index].y <= point.y
-            && wayPoints[index - 1].x >= point.x && wayPoints[index - 1].y >= point.y;
+        point.Normalize();
+        return Vector2.Dot(wayPoints[index].normalized, point) > 0.999f
+            && Vector2.Dot(wayPoints[index - 1].normalized, point) < -0.999f;
+
+        //return wayPoints[index].x <= point.x && wayPoints[index].y <= point.y
+        //    && wayPoints[index - 1].x >= point.x && wayPoints[index - 1].y >= point.y;
     }
 }

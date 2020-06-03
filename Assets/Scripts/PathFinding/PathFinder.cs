@@ -14,10 +14,11 @@ public static class Heuristics
 
 public class PathFinder
 {
-
+#if UNITY_EDITOR
     public List<Vector3> serachPoints;
-    public bool goalFound = false;
+#endif
 
+    public bool goalFound = false;
     private IPathReconstractor pathReconstractor = new PathReconstractor();
 
     public bool TryGetPath(Node start,Node goal,GridMap map,out List<Vector2> path, float maxJumpCost = 0.0f)
@@ -33,7 +34,7 @@ public class PathFinder
         var frontier = new SimplePriorityQueue<Node,float>();
         var nodeCost = new Dictionary<Node, float>();
         var nodeJumpCost = new Dictionary<Node, float>();
-        var jumpFrom = new Dictionary<Node, Node>();
+        
 
         frontier.Enqueue(start, 0);
         cameFrom.Add(start, null);
@@ -50,10 +51,12 @@ public class PathFinder
             //exit loop and reconstruct path if goal found
             if (current == goal)
             {
+#if UNITY_EDITOR
                 if (cameFrom != null)
                 {
                     serachPoints = cameFrom.Values.ToList().ConvertAll(node => node == null ? Vector3.zero : (Vector3)node.GetNodeCenter());
                 }
+#endif
                 path = pathReconstractor.RecreatePath(cameFrom, start, goal);
                 return true;
             }
@@ -90,11 +93,12 @@ public class PathFinder
             }
 
         }
+#if UNITY_EDITOR
         if (cameFrom != null)
         {
             serachPoints = cameFrom.Values.ToList().ConvertAll(node => node == null ? Vector3.zero : (Vector3)node.GetNodeCenter());
         }
-
+#endif
         path = null;
         return false;
     }
@@ -116,5 +120,20 @@ public class PathFinder
 
 
         return true;
+    }
+
+    public void DrawLastSearchLocation()
+    {
+#if UNITY_EDITOR
+        if (serachPoints != null)
+        {
+            for (int i = 0; i < serachPoints.Count; i++)
+            {
+                var factor = (float)i / serachPoints.Count;
+                Gizmos.color = Color.Lerp(Color.green, Color.red, factor);
+                Gizmos.DrawCube(serachPoints[i], Vector3.one * Mathf.Lerp(0.3f, 0.6f, factor));
+            }
+        }
+#endif
     }
 }
