@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class GridMapGenerator : MonoBehaviour
 {
@@ -26,8 +27,6 @@ public class GridMapGenerator : MonoBehaviour
     {
         map.SetMap(width, height, startPoint);
 
-
-        //Generate Map first phase
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -39,88 +38,28 @@ public class GridMapGenerator : MonoBehaviour
                 var xPosition = map.startPosition.x + x;
                 var yPosition = map.startPosition.y + y;
 
-                map.SetNode(x,y,new Node(xPosition,yPosition,nodeType));
+                map.SetNode(x, y, new Node(xPosition, yPosition, nodeType));
             }
         }
-
-        //Generate Map secound phase
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                if (map.GetNodeType(x, y) != Node.NodeType.free) continue;
-
-                if(IsWalkableNode(x,y))
-                {
-                    map.SetNodeType(x, y, Node.NodeType.walkable);
-                }
-            }
-        }
-
-        //Generate Map thrid phase
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                if (map.GetNodeType(x, y) != Node.NodeType.free) continue;
-
-                if (IsEdgeNode(x, y))
-                {
-                    map.SetNodeType(x, y, Node.NodeType.edge);
-                }
-            }
-        }
-
-        
     }
 
-    private bool IsWalkableNode(int x,int y)
-    {
-        return y == 0 || map.GetNodeType(x, y - 1) == Node.NodeType.wall;
-    }
-
-    private bool IsEdgeNode(int x, int y)
-    {
-        var sideNodeFree = false;
-        if (map.IsValideIndex(x - 1, y))
-        {
-            sideNodeFree = IsNodeOfType(x - 1, y, Node.NodeType.walkable);
-        }
-        if (map.IsValideIndex(x + 1, y))
-        {
-            sideNodeFree = sideNodeFree || IsNodeOfType(x + 1, y, Node.NodeType.walkable);
-        }
-
-        var diagonalNodesWalkable = false;
-
-        if (map.IsValideIndex(x - 1, y - 1))
-        {
-            diagonalNodesWalkable = IsNodeOfType(x - 1, y - 1, Node.NodeType.wall);
-        }
-        if (map.IsValideIndex(x + 1, y - 1))
-        {
-            diagonalNodesWalkable = diagonalNodesWalkable || IsNodeOfType(x + 1, y - 1, Node.NodeType.wall);
-        }
-
-        return sideNodeFree && diagonalNodesWalkable && !IsNodeOfType(x,y-1,Node.NodeType.wall);
-    }
-
-    private bool IsNodeOfType(int x,int y,Node.NodeType type)
-    {
-        return map.GetNodeType(x, y) == type;
-    }
-
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         if (showGrid)
         {
-            for (int x = 0; x < width; x++)
+            Gizmos.color = new Color(.7f, .7f, .2f, .5f);
+            for (int x = 0; x <= width; x++)
             {
-                for (int y = 0; y < height; y++)
-                {
-                    Gizmos.color = Color.gray;
-                    Gizmos.DrawWireCube(startPoint + new Vector2(x + .5f, y + .5f), Vector2.one);
-                }
+                var start = startPoint + Vector2.right * x;
+                var end = startPoint + new Vector2(x,height);
+                Gizmos.DrawLine(start, end);
+            }
+
+            for (int y = 0; y <= height; y++)
+            {
+                var start = startPoint + Vector2.up * y;
+                var end = startPoint + new Vector2(width, y);
+                Gizmos.DrawLine(start, end);
             }
         }
         if (showMap)

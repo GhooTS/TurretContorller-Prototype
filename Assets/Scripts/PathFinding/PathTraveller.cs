@@ -8,7 +8,7 @@ public class PathTraveller
     private int wayPointIndex = 1;
 
 
-    public void Set(Path path)
+    public void SetPath(Path path)
     {
         wayPointIndex = 1;
         PathComplited = false;
@@ -16,7 +16,7 @@ public class PathTraveller
         MoveDirection = GetCurrentDirection();
     }
 
-    public Path Get()
+    public Path GetPath()
     {
         return path;
     }

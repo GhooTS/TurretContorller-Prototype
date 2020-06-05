@@ -5,6 +5,14 @@ public class Path
 {
     private List<Vector2> wayPoints;
     public float PathLenght { get; private set; }
+    public Vector2 Start 
+    { 
+        get { return wayPoints.Count != 0 ? wayPoints[wayPoints.Count - 1] : Vector2.zero; } 
+    }
+    public Vector2 End 
+    {
+        get { return wayPoints.Count != 0 ? wayPoints[0] : Vector2.zero; }
+    }
     public Vector2 this[int i]
     {
         get { return wayPoints[i]; }
@@ -26,6 +34,14 @@ public class Path
         }
     }
 
+
+    public void Combine(Path path)
+    {
+        if (path == null) return;
+
+        wayPoints.AddRange(path.wayPoints);
+        PathLenght += path.PathLenght;
+    }
 
     public bool IsBetween(int index,Vector2 point)
     {

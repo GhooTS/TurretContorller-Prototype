@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class GridMap : MonoBehaviour
 {
+    //TODO : Make nodes serializable
     private Node[,] nodes;
+    [HideInInspector]
     public Vector2Int startPosition;
+    [Tooltip("diagonal movement is not supported for 'platformer' pathfinding" 
+            + " enabling it in current state can lead to unknown behaviour")]
     public bool diagnonalMovement;
     private Bounds mapBounds;
 
@@ -39,7 +44,12 @@ public class GridMap : MonoBehaviour
 
     public Node.NodeType GetNodeType(int x,int y)
     {
-        return nodes[x, y].type;
+        return IsValideIndex(x,y) ? nodes[x, y].type : Node.NodeType.free;
+    }
+
+    public bool IsFreeNode(int x,int y)
+    {
+        return IsValideIndex(x, y) ? nodes[x, y].type == Node.NodeType.free : true;
     }
 
     public void SetNodeType(int x,int y,Node.NodeType type)
@@ -47,60 +57,32 @@ public class GridMap : MonoBehaviour
         nodes[x, y].type = type;
     }
 
-    public List<Node> GetNeightbors(Node node, float verticalMoveDirection)
+    public List<Node> GetNeightbors(Node node)
     {
         var output = new List<Node>();
         var IndexVector = GetNodeIndex(node);
-
-        //Vertical neightbors
-        if(node.IsNodeOfType(Node.NodeType.free) || node.IsNodeOfType(Node.NodeType.edge))
+        for (int x = -1; x <= 1; x++)
         {
-            if (IsValideIndex(IndexVector.x, IndexVector.y + 1) && nodes[IndexVector.x, IndexVector.y + 1].type != Node.NodeType.wall)
-                output.Add(nodes[IndexVector.x, IndexVector.y + 1]);
-
-            if (IsValideIndex(IndexVector.x, IndexVector.y - 1) && nodes[IndexVector.x, IndexVector.y - 1].type != Node.NodeType.wall)
-                output.Add(nodes[IndexVector.x, IndexVector.y - 1]);
-
-            if (verticalMoveDirection > 0)
+            for (int y = -1; y <= 1; y++)
             {
+                int xIndex = IndexVector.x + x;
+                int yIndex = IndexVector.y + y;
 
-                if (IsValideIndex(IndexVector.x + 1, IndexVector.y) && nodes[IndexVector.x + 1, IndexVector.y].type == Node.NodeType.walkable)
-                    output.Add(nodes[IndexVector.x + 1, IndexVector.y]);
+                if (diagnonalMovement == false && Mathf.Abs(x + y) != 1) continue;
 
-                if (IsValideIndex(IndexVector.x - 1, IndexVector.y) && nodes[IndexVector.x - 1, IndexVector.y].type == Node.NodeType.walkable)
-                    output.Add(nodes[IndexVector.x - 1, IndexVector.y]);
-            }
-        }
-        else
-        {
-
-            for (int x = -1; x <= 1; x++)
-            {
-                for (int y = -1; y <= 1; y++)
+                if (IsValideIndex(xIndex, yIndex) && nodes[xIndex, yIndex].type != Node.NodeType.wall)
                 {
-                    int xIndex = IndexVector.x + x;
-                    int yIndex = IndexVector.y + y;
-
-                    if (diagnonalMovement == false && Mathf.Abs(x + y) != 1) continue;
-
-                    if (IsValideIndex(xIndex, yIndex) && nodes[xIndex, yIndex].type != Node.NodeType.wall)
-                    {
-                        output.Add(nodes[xIndex, yIndex]);
-                    }
+                    output.Add(nodes[xIndex, yIndex]);
                 }
             }
-
         }
-
-
-        
 
         return output;
     }
 
     private Vector2Int GetNodeIndex(Node node)
     {
-        var output = node.position - startPosition;
+        var output = (Vector2Int)node.position - startPosition;
         return output;
     }
 
@@ -138,27 +120,11 @@ public class GridMap : MonoBehaviour
     {
         if (nodes == null) return;
 
+        Gizmos.color = new Color(.3f, .3f, .7f);
         foreach (var node in nodes)
         {
-            switch (node.type)
-            {
-                case Node.NodeType.wall:
-                    Gizmos.color = Color.red;
-                    continue;
-                case Node.NodeType.free:
-                    Gizmos.color = Color.yellow;
-                    continue;
-                case Node.NodeType.walkable:
-                    Gizmos.color = Color.green;
-                    break;
-                case Node.NodeType.edge:
-                    Gizmos.color = Color.cyan;
-                    break;
-                default:
-                    Gizmos.color = Color.gray;
-                    break;
-            }
-            Gizmos.DrawCube(node.GetNodeCenter(), Vector2.one * .2f);
+            if(node.IsNodeOfType(Node.NodeType.free))
+                Gizmos.DrawSphere(node.GetNodeCenter(), .15f);
         }
     }
 }

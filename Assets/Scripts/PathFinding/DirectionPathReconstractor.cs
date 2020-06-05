@@ -1,15 +1,21 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class PathReconstractor : IPathReconstractor
+/// <summary>
+/// Recostract path base on direction changing
+/// </summary>
+public class DirectionPathReconstractor : IPathReconstractor
 {
+    /// <summary>
+    /// Recostract path base on direction changing
+    /// </summary>
     public List<Vector2> RecreatePath(Dictionary<Node, Node> cameFrom, Node start, Node goal)
     {
         var path = new List<Vector2>();
         var current = goal;
         Vector2 currentDirection = Vector2.zero;
         path.Add(current.GetNodeCenter());
-        while (current != start)
+        while ((Vector2Int)current.position != (Vector2Int)start.position)
         {
             var currentPosition = current.GetNodeCenter();
             if (cameFrom.TryGetValue(current, out current))
@@ -28,7 +34,8 @@ public class PathReconstractor : IPathReconstractor
             }
             else
             {
-                break;
+                Debug.LogError("Data for path reconstration was incorrect");
+                return null;
             }
         }
 

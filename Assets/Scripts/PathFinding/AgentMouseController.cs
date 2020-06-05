@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class AgentTest : MonoBehaviour
+public class AgentMouseController : MonoBehaviour
 {
     public Agent agent;
 
