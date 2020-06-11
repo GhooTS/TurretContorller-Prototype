@@ -67,8 +67,8 @@ public class Pathfinder
             if (current.JumpCost == 0) 
             {
                 var distanceToGoal = Heuristics.GetManhattan(current.GetNodeCenter(), goal.GetNodeCenter());
-                jumpOpportunity = (current.y < goal.y && distanceToGoal <= agentModel.maxJumpHeight * 2)
-                               || HesJumpOpportunity(map, current.x, current.y, agentModel.maxJumpHeight);
+                jumpOpportunity = (current.y < goal.y && distanceToGoal <= agentModel.maxJumpHeight * 2) 
+                                  || HesJumpOpportunity(map, current.x, current.y, agentModel.maxJumpHeight);
             }
 
             foreach (var neightbor in map.GetNeightbors(current))
@@ -229,12 +229,12 @@ public class Pathfinder
                 break;
             }
 
-            if (map.IsFreeNode(x - 1, y + i) && map.IsFreeNode(x - 1, y + i + 1) == false)
+            if (map.IsFreeNode(x - 1, y + i) == false && map.IsFreeNode(x - 1, y + i + 1))
             {
                 return true;
             }
 
-            if (map.IsFreeNode(x + 1, y + i) && map.IsFreeNode(x + 1, y + i + 1) == false)
+            if (map.IsFreeNode(x + 1, y + i) == false && map.IsFreeNode(x + 1, y + i + 1) )
             {
                 return true;
             }
