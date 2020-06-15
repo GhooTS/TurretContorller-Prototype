@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 
-public static class Heuristics
+namespace Nav2D
 {
-    public static float GetManhattan(Vector2 from,Vector2 to,float D = 1f)
+    public static class Heuristics
     {
-        return D * (Mathf.Abs(from.x - to.x) + Mathf.Abs(from.y - to.y));
+        public static float GetManhattan(Vector2 from, Vector2 to, float D = 1f)
+        {
+            return D * (Mathf.Abs(from.x - to.x) + Mathf.Abs(from.y - to.y));
+        }
     }
 }

@@ -1,55 +1,58 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Path
+namespace Nav2D
 {
-    private List<Vector2> wayPoints;
-    public float PathLenght { get; private set; }
-    public Vector2 Start 
-    { 
-        get { return wayPoints.Count != 0 ? wayPoints[wayPoints.Count - 1] : Vector2.zero; } 
-    }
-    public Vector2 End 
+    public class Path
     {
-        get { return wayPoints.Count != 0 ? wayPoints[0] : Vector2.zero; }
-    }
-    public Vector2 this[int i]
-    {
-        get { return wayPoints[i]; }
-        set { wayPoints[i] = value; }
-    }
-    public int Count
-    {
-        get { return wayPoints.Count; }
-    }
-
-    public Path(List<Vector2> wayPoints)
-    {
-        this.wayPoints = wayPoints;
-        PathLenght = 0;
-
-        for (int i = 1; i < wayPoints.Count; i++)
+        private List<Vector2> waypoints;
+        public float Distance { get; private set; }
+        public Vector2 Start
         {
-            PathLenght += Mathf.Abs(wayPoints[i].x - wayPoints[i - 1].x);
+            get { return waypoints[0]; }
         }
-    }
+        public Vector2 End
+        {
+            get { return waypoints[waypoints.Count - 1]; }
+        }
+        public Vector2 this[int i]
+        {
+            get { return waypoints[i]; }
+            set { waypoints[i] = value; }
+        }
+        public int Count
+        {
+            get { return waypoints.Count; }
+        }
+
+        public Path(List<Vector2> waypoints)
+        {
+            this.waypoints = waypoints;
+            Distance = 0;
+
+            for (int i = 1; i < waypoints.Count; i++)
+            {
+                Distance += Mathf.Abs(waypoints[i].x - waypoints[i - 1].x);
+            }
+        }
 
 
-    public void Combine(Path path)
-    {
-        if (path == null) return;
+        public void Combine(Path path)
+        {
+            if (path == null) return;
 
-        wayPoints.AddRange(path.wayPoints);
-        PathLenght += path.PathLenght;
-    }
+            waypoints.AddRange(path.waypoints);
+            Distance += path.Distance;
+        }
 
-    public bool IsBetween(int index,Vector2 point)
-    {
-        point.Normalize();
-        return Vector2.Dot(wayPoints[index].normalized, point) > 0.999f
-            && Vector2.Dot(wayPoints[index - 1].normalized, point) < -0.999f;
+        public bool IsBetween(int index, Vector2 point)
+        {
+            point.Normalize();
+            return Vector2.Dot(waypoints[index].normalized, point) > 0.999f
+                && Vector2.Dot(waypoints[index - 1].normalized, point) < -0.999f;
 
-        //return wayPoints[index].x <= point.x && wayPoints[index].y <= point.y
-        //    && wayPoints[index - 1].x >= point.x && wayPoints[index - 1].y >= point.y;
+            //return wayPoints[index].x <= point.x && wayPoints[index].y <= point.y
+            //    && wayPoints[index - 1].x >= point.x && wayPoints[index - 1].y >= point.y;
+        }
     }
 }

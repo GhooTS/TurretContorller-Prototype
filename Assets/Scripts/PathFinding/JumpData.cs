@@ -1,5 +1,8 @@
-﻿public struct JumpData
+﻿namespace Nav2D
 {
-    public int lowerJumpValue;
-    public bool horizontalMovement;
+    public struct JumpData
+    {
+        public int lowerJumpValue;
+        public bool horizontalMovement;
+    }
 }

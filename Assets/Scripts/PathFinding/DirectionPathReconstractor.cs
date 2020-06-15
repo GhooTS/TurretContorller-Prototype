@@ -1,46 +1,50 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Recostract path base on direction changing
-/// </summary>
-public class DirectionPathReconstractor : IPathReconstractor
+namespace Nav2D
 {
+
     /// <summary>
     /// Recostract path base on direction changing
     /// </summary>
-    public List<Vector2> RecreatePath(Dictionary<Node, Node> cameFrom, Node start, Node goal)
+    public class DirectionPathReconstractor : IPathReconstractor
     {
-        var path = new List<Vector2>();
-        var current = goal;
-        Vector2 currentDirection = Vector2.zero;
-        path.Add(current.GetNodeCenter());
-        while ((Vector2Int)current.position != (Vector2Int)start.position)
+        /// <summary>
+        /// Recostract path base on direction changing
+        /// </summary>
+        public List<Vector2> RecreatePath(Dictionary<Node, Node> cameFrom, Node start, Node goal)
         {
-            var currentPosition = current.GetNodeCenter();
-            if (cameFrom.TryGetValue(current, out current))
+            var path = new List<Vector2>();
+            var current = goal;
+            Vector2 currentDirection = Vector2.zero;
+            path.Add(current.GetNodeCenter());
+            while ((Vector2Int)current.position != (Vector2Int)start.position)
             {
-                var nodeCenterPosition = current.GetNodeCenter();
-                var newDirection = nodeCenterPosition - currentPosition;
-                if (currentDirection != newDirection)
+                var currentPosition = current.GetNodeCenter();
+                if (cameFrom.TryGetValue(current, out current))
                 {
-                    path.Add(nodeCenterPosition);
-                    currentDirection = newDirection;
+                    var nodeCenterPosition = current.GetNodeCenter();
+                    var newDirection = nodeCenterPosition - currentPosition;
+                    if (currentDirection != newDirection)
+                    {
+                        path.Add(nodeCenterPosition);
+                        currentDirection = newDirection;
+                    }
+                    else
+                    {
+                        path[path.Count - 1] = nodeCenterPosition;
+                    }
                 }
                 else
                 {
-                    path[path.Count - 1] = nodeCenterPosition;
+                    Debug.LogError("Data for path reconstration was incorrect");
+                    return null;
                 }
             }
-            else
-            {
-                Debug.LogError("Data for path reconstration was incorrect");
-                return null;
-            }
+
+            path.Reverse();
+
+            return path;
         }
-
-        path.Reverse();
-
-        return path;
     }
 }

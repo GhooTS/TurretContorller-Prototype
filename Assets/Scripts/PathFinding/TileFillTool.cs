@@ -1,43 +1,47 @@
-﻿using UnityEngine;
+﻿using Nav2D;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
-public class TileFillTool : MonoBehaviour
+namespace Nav2D.TestUtility
 {
-    public GridMap gridMap;
-    public Tilemap tileMap;
-    public Tile tile;
-
-    private Vector3Int lastPosition = Vector3Int.one;
-
-    private void Update()
+    public class TileFillTool : MonoBehaviour
     {
-        if (Mouse.current.rightButton.isPressed)
+        public NavGrid gridMap;
+        public Tilemap tileMap;
+        public Tile tile;
+
+        private Vector3Int lastPosition = Vector3Int.one;
+
+        private void Update()
         {
-            if(gridMap != null && tileMap != null && tile != null)
+            if (Mouse.current.rightButton.isPressed)
             {
-                Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-                var tileMapIndex = Vector3Int.FloorToInt(mousePosition);
-                var gridMapIndex = gridMap.FromPositionToIndex(mousePosition);
+                if (gridMap != null && tileMap != null && tile != null)
+                {
+                    Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+                    var tileMapIndex = Vector3Int.FloorToInt(mousePosition);
+                    var gridMapIndex = gridMap.FromPositionToIndex(mousePosition);
 
-                if (tileMapIndex == lastPosition) return;
+                    if (tileMapIndex == lastPosition) return;
 
-                if (gridMap.IsValideIndex(gridMapIndex.x, gridMapIndex.y) == false) return; 
+                    if (gridMap.IsValideIndex(gridMapIndex.x, gridMapIndex.y) == false) return;
 
-                //Update tilemap
-                var insertTile = !tileMap.HasTile(tileMapIndex);
-                tileMap.SetTile(tileMapIndex,insertTile ? tile : null);
+                    //Update TileMap
+                    var insertTile = !tileMap.HasTile(tileMapIndex);
+                    tileMap.SetTile(tileMapIndex, insertTile ? tile : null);
 
-                //Update gridmap
-                gridMap.SetNodeType(gridMapIndex.x,gridMapIndex.y, insertTile ? Node.NodeType.wall : Node.NodeType.free);
+                    //Update NavGrid
+                    gridMap.SetNodeType(gridMapIndex.x, gridMapIndex.y, insertTile ? Node.NodeType.wall : Node.NodeType.free);
 
-                lastPosition = tileMapIndex;
+                    lastPosition = tileMapIndex;
+                }
             }
-        }
 
-        if (Mouse.current.rightButton.wasReleasedThisFrame)
-        {
-            lastPosition = Vector3Int.one;
+            if (Mouse.current.rightButton.wasReleasedThisFrame)
+            {
+                lastPosition = Vector3Int.one;
+            }
         }
     }
 }
