@@ -74,29 +74,19 @@ namespace Nav2D
         {
             if (NavGrid == null)
             {
-                Debug.LogError($"Agent <i>{name}</i> is off GridMap", this);
+                Debug.LogError($"Agent <i>{name}</i> is off NavGrid", this);
                 path = null;
                 return false;
             }
 
-            var start = NavGrid.GetNode(transform.position);
-            var goal = NavGrid.GetNode(destination);
-
-            if (goal != null && goal.IsNodeOfType(Node.NodeType.wall))
-            {
-                Debug.LogWarning($"Location for Agent <i>{name}</i> is unreachable", this);
-                path = null;
-                return false;
-            }
-
-            var timeNow = System.DateTime.Now;
-            bool pathFound = pathFinder.TryGetPath(start, goal, NavGrid, agentModel, out List<Vector2> newPath);
-            path = newPath != null ? new Path(newPath) : null;
-
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            bool pathFound = pathFinder.TryGetPath(transform.position, destination, NavGrid, agentModel, out List<Vector2> newPath);
+            path = pathFound ? new Path(newPath) : null;
+            watch.Stop();
             if (logToConsole)
             {
-                Debug.Log($"Path {(pathFound ? "" : "not")} found for agent: <i>{name}</i> from {start.GetNodeCenter()} to {destination}"
-                        + $" in time: {(System.DateTime.Now - timeNow).Duration().TotalMilliseconds} ms", this);
+                Debug.Log($"Path {(pathFound ? "" : "not")} found for agent: <i>{name}</i> from {transform.position} to {destination}"
+                        + $" in time: {watch.ElapsedMilliseconds} ms", this);
             }
 
             return pathFound;
@@ -130,15 +120,15 @@ namespace Nav2D
                     var from = currentPath[i];
                     var to = currentPath[i + 1];
                     Gizmos.DrawLine(from, to);
-                    Gizmos.DrawCube(from, Vector2.one * .5f);
+                    Gizmos.DrawCube(from, Vector2.one * NavGrid.CellSize / 2);
                     if (i == currentPath.Count - 2)
                     {
                         Gizmos.DrawCube(to, Vector2.one * .5f);
                     }
                 }
-
             }
 
+            
         }
     }
 }

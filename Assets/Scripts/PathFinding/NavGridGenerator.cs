@@ -1,21 +1,21 @@
 ﻿using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace Nav2D
 {
     public class NavGridGenerator : MonoBehaviour
     {
         public NavGrid navGrid;
-        public Vector2Int startPoint;
+        public Vector2Int offset;
+        public float cellSize = 1;
         [Min(0)]
-        public int width;
+        public int width = 25;
         [Min(0)]
-        public int height;
+        public int height = 25;
         public LayerMask collisonLayer;
         [Range(0, 1)]
-        public float precision = 1;
+        public float precision = .9f;
 
-        public bool showScanGrid = false;
+        public bool showGrid = false;
         public bool showNavGrid = false;
 
 
@@ -27,41 +27,40 @@ namespace Nav2D
         [ContextMenu("Generate map")]
         public void GenerateMap()
         {
-            navGrid.Init(width, height, startPoint);
+            navGrid.Init(width, height, offset);
 
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    var currentPosition = startPoint + new Vector2(x + 0.5f, y + 0.5f);
+                    var hit = Physics2D.BoxCast(navGrid.IndexToPosition(new Vector2Int(x,y)), Vector2.one * navGrid.CellSize * precision, 0, Vector2.zero, 0, collisonLayer);
+                    var nodeType = hit.collider ? NavGrid.NodeType.wall : NavGrid.NodeType.free;
 
-                    var hit = Physics2D.BoxCast(currentPosition, Vector2.one * precision, 0, Vector2.zero, 0, collisonLayer);
-                    var nodeType = hit.collider ? Node.NodeType.wall : Node.NodeType.free;
-                    var xPosition = navGrid.startPosition.x + x;
-                    var yPosition = navGrid.startPosition.y + y;
-
-                    navGrid.SetNode(x, y, new Node(xPosition, yPosition, nodeType));
+                    navGrid.SetNode(x, y, nodeType);
                 }
             }
         }
 
         private void OnDrawGizmosSelected()
         {
-            if (showScanGrid)
+            if (showGrid && navGrid != null)
             {
                 Gizmos.color = new Color(.7f, .7f, .2f, .5f);
+                Vector2 halfCell = Vector2.one * cellSize / 2;
+                Vector2 start;
+                Vector2 end;
                 for (int x = 0; x <= width; x++)
                 {
-                    var start = startPoint + Vector2.right * x;
-                    var end = startPoint + new Vector2(x, height);
-                    Gizmos.DrawLine(start, end);
+                    start = navGrid.IndexToPosition(new Vector2Int(x, 0)) - halfCell;
+                    end = navGrid.IndexToPosition(new Vector2Int(x, height)) - halfCell;
+                    Gizmos.DrawLine(start,end);
                 }
 
                 for (int y = 0; y <= height; y++)
                 {
-                    var start = startPoint + Vector2.up * y;
-                    var end = startPoint + new Vector2(width, y);
-                    Gizmos.DrawLine(start, end);
+                    start = navGrid.IndexToPosition(new Vector2Int(0, y)) - halfCell;
+                    end = navGrid.IndexToPosition(new Vector2Int(width, y)) - halfCell;
+                    Gizmos.DrawLine(start,end);
                 }
             }
             if (showNavGrid)

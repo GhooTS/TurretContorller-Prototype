@@ -1,37 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Nav2D
 {
+
     public class NavGrid : MonoBehaviour
     {
-        //TODO : Make nodes serializable
-        private Node[,] nodes;
-        [HideInInspector]
-        public Vector2Int startPosition;
+        public enum NodeType
+        {
+            free, wall
+        }
+
         [Tooltip("diagonal movement is not supported for 'platformer' pathfinding"
                 + " enabling it in current state can lead to unknown behaviour")]
         public bool diagnonalMovement;
+
+        public float CellSize { get; private set; }
+        private NodeType[,] nodes;
+        private Vector2Int offset;
         private Bounds bounds;
 
         public bool IsWithinNavGridBounds(Vector2 position)
         {
             return bounds.Contains(position);
         }
-        public void Init(int width, int height, Vector2Int startPosition)
+
+        public void Init(int width, int height, Vector2Int offset, float cellSize = 1f)
         {
             width = Mathf.Max(0, width);
             height = Mathf.Max(0, height);
 
-            nodes = new Node[width, height];
-            var boundsCenter = new Vector2(startPosition.x + width / 2, startPosition.y + height / 2);
-            var boundsSize = new Vector2(width, height);
+            nodes = new NodeType[width, height];
+            var boundsCenter = new Vector2((offset.x + width) * cellSize / 2, (offset.y + height) * cellSize / 2);
+            var boundsSize = new Vector2(width * cellSize, height * cellSize);
             bounds = new Bounds(boundsCenter, boundsSize);
-            this.startPosition = startPosition;
+            this.offset = offset;
+            CellSize = cellSize;
         }
 
-        public void SetNode(int x, int y, Node node)
+        public void SetNode(int x, int y, NodeType node)
         {
             if (IsValideIndex(x, y))
             {
@@ -43,37 +51,46 @@ namespace Nav2D
             }
         }
 
-        public Node.NodeType GetNodeType(int x, int y)
+        public bool IsNodeOfType(int x,int y,NodeType nodeType)
         {
-            return IsValideIndex(x, y) ? nodes[x, y].type : Node.NodeType.free;
+            return IsValideIndex(x, y) && nodes[x, y] == nodeType;
+        }
+
+        public NodeType GetNodeType(int x, int y)
+        {
+            return IsValideIndex(x, y) ? nodes[x, y] : NodeType.free;
         }
 
         public bool IsFreeNode(int x, int y)
         {
-            return IsValideIndex(x, y) ? nodes[x, y].type == Node.NodeType.free : true;
+            return GetNodeType(x,y) == NodeType.free;
         }
 
-        public void SetNodeType(int x, int y, Node.NodeType type)
+        public bool IsGroundedNode(int x,int y)
         {
-            nodes[x, y].type = type;
+            return GetNodeType(x, y - 1) == NodeType.wall;
         }
 
-        public List<Node> GetNeightbors(Node node)
+        public bool IsCelingNode(int x,int y)
         {
-            var output = new List<Node>();
-            var IndexVector = GetNodeIndex(node);
+            return GetNodeType(x, y + 1) == NodeType.wall;
+        }
+
+        public List<Vector2Int> GetNeightbors(Vector2Int indexVector)
+        {
+            var output = new List<Vector2Int>();
             for (int x = -1; x <= 1; x++)
             {
                 for (int y = -1; y <= 1; y++)
                 {
-                    int xIndex = IndexVector.x + x;
-                    int yIndex = IndexVector.y + y;
+                    int xIndex = indexVector.x + x;
+                    int yIndex = indexVector.y + y;
 
                     if (diagnonalMovement == false && Mathf.Abs(x + y) != 1) continue;
 
-                    if (IsValideIndex(xIndex, yIndex) && nodes[xIndex, yIndex].type != Node.NodeType.wall)
+                    if (IsNodeOfType(xIndex, yIndex, NodeType.free)) 
                     {
-                        output.Add(nodes[xIndex, yIndex]);
+                        output.Add(new Vector2Int(xIndex, yIndex));
                     }
                 }
             }
@@ -81,35 +98,27 @@ namespace Nav2D
             return output;
         }
 
-        private Vector2Int GetNodeIndex(Node node)
+
+        public Vector2 IndexToPosition(Vector2Int indexVector)
         {
-            var output = (Vector2Int)node.position - startPosition;
+            var output = CellSize * (Vector2)indexVector + Vector2.one * (CellSize / 2) + offset;
+            
             return output;
         }
 
-        public Vector2Int FromPositionToIndex(Vector2 position)
+        public Vector2Int PositionToIndex(Vector2 position)
         {
-            return Vector2Int.FloorToInt(position - startPosition);
+            if (bounds.Contains(position) == false) return Vector2Int.left;
+            var distance = position - offset;
+            var vectorIndex = new Vector2Int((int)(distance.x / CellSize), (int)(distance.y / CellSize));
+            vectorIndex.x = Mathf.Abs(vectorIndex.x);
+            vectorIndex.y = Mathf.Abs(vectorIndex.y);
+            return vectorIndex;
         }
 
         public Vector2 GetClosesPoint(Vector2 position)
         {
             return bounds.ClosestPoint(position);
-        }
-
-        public Node GetNode(Vector2 position)
-        {
-            return GetNode(FromPositionToIndex(position));
-        }
-
-        public Node GetNode(Vector2Int indexVector)
-        {
-            return GetNode(indexVector.x, indexVector.y);
-        }
-
-        public Node GetNode(int x, int y)
-        {
-            return IsValideIndex(x, y) ? nodes[x, y] : null;
         }
 
         public bool IsValideIndex(int x, int y)
@@ -122,10 +131,15 @@ namespace Nav2D
             if (nodes == null) return;
 
             Gizmos.color = new Color(.3f, .3f, .7f);
-            foreach (var node in nodes)
+            for (int x = 0; x < nodes.GetLength(0); x++)
             {
-                if (node.IsNodeOfType(Node.NodeType.free))
-                    Gizmos.DrawSphere(node.GetNodeCenter(), .15f);
+                for (int y = 0; y < nodes.GetLength(1); y++)
+                {
+                    if (IsFreeNode(x, y))
+                    {
+                        Gizmos.DrawSphere(IndexToPosition(new Vector2Int(x, y)), CellSize / 4f);
+                    }
+                }
             }
         }
     }

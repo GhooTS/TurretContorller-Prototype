@@ -11,15 +11,16 @@ namespace Nav2D
     {
         //TODO : Craete better path reconstractor
         private IPathReconstractor pathReconstractor = new DirectionPathReconstractor();
+        //TODO : Create proper pathfinding debugger
         private PathfinderDebugger debugger = new PathfinderDebugger();
         private bool goalFound = false;
 
         private const int MINIMAL_DICTIONARY_SIZE = 50;
 
-        public bool TryGetPath(Node start, Node goal, NavGrid navGrid, NavGridAgentModel agentModel, out List<Vector2> path)
+        public bool TryGetPath(Vector2 startPosition, Vector2 goalPosition, NavGrid navGrid, NavGridAgentModel agentModel, out List<Vector2> path)
         {
 
-            if (start == null || goal == null || navGrid == null)
+            if (navGrid == null || navGrid.IsWithinNavGridBounds(goalPosition) == false)
             {
                 path = null;
                 return false;
@@ -27,38 +28,34 @@ namespace Nav2D
 
             goalFound = false;
 
-            //TODO : Create proper pathfinding debugger
-            //DEBUG VAR---------------------------
-            //var counter = 0;
-            //var createdNodesCounter = 0;
-            //var queueMaxSize = 0;
-            //------------------------------------
+            var startIndexVector = navGrid.PositionToIndex(startPosition);
+            var goalIndexVector = navGrid.PositionToIndex(goalPosition);
 
-            var predictSize = (int)Heuristics.GetManhattan(start.GetNodeCenter(), goal.GetNodeCenter()) * 2;
+            if (navGrid.IsNodeOfType(goalIndexVector.x,goalIndexVector.y,NavGrid.NodeType.wall))
+            {
+                path = null;
+                return false;
+            }
+
+            var predictSize = (int)Heuristics.GetManhattan(startPosition, goalPosition) * 2;
             predictSize = Mathf.Max(MINIMAL_DICTIONARY_SIZE, predictSize);
 
-            var cameFrom = new Dictionary<Node, Node>(Mathf.Max(predictSize)); //Dictionary use to recreate path
-            var open = new SimplePriorityQueue<Node, float>();
+            var cameFrom = new Dictionary<Vector3Int, Node>(predictSize); //Dictionary use to recreate path
             var jumpNodeData = new Dictionary<Vector2Int, JumpData>(predictSize);
+            var open = new SimplePriorityQueue<Node, float>();
 
             Node current = null;
+            Node start = new Node(startIndexVector);
 
             open.Enqueue(start, 0);
-            cameFrom.Add(start, null);
-            start.cost = 0;
+            cameFrom.Add(new Vector3Int(start.x,start.y,0), null);
 
             while (open.Count != 0)
             {
-                //DEBUG
-                //if(queueMaxSize < open.Count)
-                //{
-                //    queueMaxSize = open.Count;
-                //}
-
                 current = open.Dequeue();
 
                 //early exit if goal found
-                if ((Vector2Int)current.position == (Vector2Int)goal.position)
+                if (current.position == goalIndexVector)
                 {
                     goalFound = true;
                     break;
@@ -66,111 +63,107 @@ namespace Nav2D
 
                 bool jumpOpportunity = false;
 
-                if (current.JumpCost == 0)
+                if (current.jumpCost == 0)
                 {
-                    var distanceToGoal = Heuristics.GetManhattan(current.GetNodeCenter(), goal.GetNodeCenter());
-                    jumpOpportunity = current.y < goal.y && distanceToGoal <= agentModel.maxJumpHeight * 2
+                    var distanceToGoal = Heuristics.GetManhattan(current.position, goalIndexVector);
+                    jumpOpportunity = current.y < goalIndexVector.y && distanceToGoal <= agentModel.maxJumpHeight * 2
                                       || HesJumpOpportunity(navGrid, current.x, current.y, agentModel.maxJumpHeight);
                 }
 
-                foreach (var neightbor in navGrid.GetNeightbors(current))
+                foreach (var neightbor in navGrid.GetNeightbors(current.position))
                 {
                     var atCeling = false;
                     var grounded = false;
 
-                    if (navGrid.GetNodeType(neightbor.x, neightbor.y - 1) == Node.NodeType.wall)
+                    //continue if neightbor is the start node
+                    if (neightbor == start.position) continue;
+
+                    if (navGrid.IsGroundedNode(neightbor.x,neightbor.y))
                         grounded = true;
-                    else if (navGrid.GetNodeType(neightbor.x, neightbor.y + 1) == Node.NodeType.wall)
+                    else if (navGrid.IsCelingNode(neightbor.x, neightbor.y))
                         atCeling = true;
 
-                    var jumpValue = GetJumpValue(current, neightbor, atCeling, grounded, agentModel);
-                    //var cost = current.cost + 1;
-                    var cost = current.cost + 1 + jumpValue * 0.001f;
+                    var jumpCost = GetJumpCost(current, neightbor, atCeling, grounded, agentModel);
 
                     if (grounded == false)
                     {
                         //Prevent starting the jump if there is non location to jump to
-                        if (current.JumpCost == 0 && jumpValue == 3 && jumpOpportunity == false) continue;
+                        if (current.jumpCost == 0 && jumpCost == 3 && jumpOpportunity == false) continue;
                         //Allow horizontal movement only from even nodes
-                        if (current.JumpCost >= 0 && current.JumpCost % 2 != 0 && current.x != neightbor.x) continue;
+                        if (current.jumpCost >= 0 && current.jumpCost % 2 != 0 && current.x != neightbor.x) continue;
                         //Prevent from moving up further than the agent max jump height allow
-                        if (current.JumpCost >= agentModel.maxJumpHeight * 2 && current.y < neightbor.y) continue;
+                        if (current.jumpCost >= agentModel.maxJumpHeight * 2 && current.y < neightbor.y) continue;
                         //After first 3 cells horizontal movement is allowed every 4-th cell (on cells with jumpvalue of 13,21,29...)
-                        if (jumpValue >= agentModel.maxJumpHeight * 2 + 6 && neightbor.x != current.x
-                            && (jumpValue - (agentModel.maxJumpHeight * 2 + 6)) % 8 != 3)
+                        if (jumpCost >= agentModel.maxJumpHeight * 2 + 6 && neightbor.x != current.x
+                            && (jumpCost - (agentModel.maxJumpHeight * 2 + 6)) % 8 != 3)
                             continue;
                     }
 
-                    //Create Clone for jump nodes 
-                    var newNeightbor = grounded ? neightbor : neightbor.Clone(jumpValue);
 
-                    var notVisited = !cameFrom.ContainsKey(newNeightbor);
+                    Vector3Int location = new Vector3Int(neightbor.x, neightbor.y, jumpCost);
 
-                    if (notVisited || cost < neightbor.cost)
+                    //-1f means node was not visited
+                    float oldCost = cameFrom.TryGetValue(location, out Node oldNode) ? oldNode.cost : -1f;
+                    var cost = current.cost + 1 + jumpCost * 0.001f;
+
+                    if (oldCost == -1f || oldCost > cost) 
                     {
-
-                        //Add jump data for jump nodes
-                        if (jumpValue != 0)
+                        if (jumpCost != 0)
                         {
-                            var hesNodeJumpData = jumpNodeData.TryGetValue((Vector2Int)neightbor.position, out JumpData jumpData);
+                            var hesNodeJumpData = jumpNodeData.TryGetValue(neightbor, out JumpData jumpData);
 
-                            if (hesNodeJumpData && jumpData.lowerJumpValue <= jumpValue)
+                            if (hesNodeJumpData && jumpData.lowerJumpValue <= jumpCost)
                             {
-                                if (jumpValue % 2 != 0 || jumpData.horizontalMovement || jumpValue >= agentModel.maxJumpHeight * 2 + 6)
+                                if (jumpCost % 2 != 0 || jumpData.horizontalMovement || jumpCost >= agentModel.maxJumpHeight * 2 + 6)
                                 {
                                     continue;
                                 }
                             }
 
-                            //DEBUG
-                            //createdNodesCounter++;
-
-                            jumpData.lowerJumpValue = jumpValue;
-                            jumpData.horizontalMovement |= jumpValue % 2 == 0;
+                            jumpData.lowerJumpValue = jumpCost;
+                            jumpData.horizontalMovement |= jumpCost % 2 == 0;
 
                             if (hesNodeJumpData)
                             {
-                                jumpNodeData[(Vector2Int)neightbor.position] = jumpData;
+                                jumpNodeData[neightbor] = jumpData;
                             }
                             else
                             {
-                                jumpNodeData.Add((Vector2Int)neightbor.position, jumpData);
+                                jumpNodeData.Add(neightbor, jumpData);
                             }
                         }
 
-                        if (notVisited)
+                        if (oldCost == -1)
                         {
-                            newNeightbor.cost = cost;
-                            cameFrom.Add(newNeightbor, current);
+                            cameFrom.Add(location, current);
                         }
                         else
                         {
-                            newNeightbor.cost = cost;
-                            cameFrom[newNeightbor] = current;
+                            cameFrom[location] = current;
                         }
 
-                        //TODO : Add support for more heuristics, (mayby by delegate?)
-                        var piority = Heuristics.GetManhattan(neightbor.GetNodeCenter(), goal.GetNodeCenter()) + cost;
-                        open.Enqueue(newNeightbor, piority);
-                    }
+                        Node newNode = new Node(neightbor)
+                        {
+                            cost = cost,
+                            distance = Heuristics.GetManhattan(current.position, goalIndexVector),
+                            jumpCost = jumpCost
+                        };
 
-                    //DEBUG
-                    //counter++;
+                        open.Enqueue(newNode, newNode.Priority);
+                    }
                 }
 
             }
 
             //DEBUG-------------------------------
-            //Debug.Log($"Nodes serachted: {counter} || Nodes created: {createdNodesCounter} " +
-            //          $"\n Queue max size: {queueMaxSize} || Predicted size: { predictSize} || Dictionary size {cameFrom.Count}");
-            debugger.SetSerachTiles(cameFrom);
+            debugger.SetSerachTiles(cameFrom,navGrid);
             //------------------------------------
 
-            path = goalFound ? pathReconstractor.RecreatePath(cameFrom, start, current) : null;
+            path = goalFound ? pathReconstractor.RecreatePath(cameFrom, start, current,navGrid) : null;
             return goalFound;
         }
 
-        private int GetJumpValue(Node current, Node neightbor, bool atCeling, bool grounded, NavGridAgentModel agentModel)
+        private int GetJumpCost(Node current, Vector2Int neightbor, bool atCeling, bool grounded, NavGridAgentModel agentModel)
         {
             var output = 0;
 
@@ -178,11 +171,11 @@ namespace Nav2D
             {
                 if (current.x != neightbor.x)
                 {
-                    output = Mathf.Max(agentModel.maxJumpHeight * 2 + 1, current.JumpCost + 1);
+                    output = Mathf.Max(agentModel.maxJumpHeight * 2 + 1, current.jumpCost + 1);
                 }
                 else
                 {
-                    output = Mathf.Max(agentModel.maxJumpHeight * 2, current.JumpCost + 2);
+                    output = Mathf.Max(agentModel.maxJumpHeight * 2, current.jumpCost + 2);
                 }
             }
             else if (grounded)
@@ -191,29 +184,29 @@ namespace Nav2D
             }
             else if (current.y < neightbor.y) // jumping
             {
-                if (current.JumpCost < 2)
+                if (current.jumpCost < 2)
                 {
                     output = 3;
                 }
                 else
                 {
-                    output = current.JumpCost + (current.JumpCost % 2 == 0 ? 2 : 1);
+                    output = current.jumpCost + (current.jumpCost % 2 == 0 ? 2 : 1);
                 }
             }
             else if (current.y > neightbor.y) // falling
             {
-                output = Mathf.Max(agentModel.maxJumpHeight * 2, current.JumpCost + (current.JumpCost % 2 == 0 ? 2 : 1));
+                output = Mathf.Max(agentModel.maxJumpHeight * 2, current.jumpCost + (current.jumpCost % 2 == 0 ? 2 : 1));
             }
             else if (grounded == false && current.x != neightbor.x) // walling off the egde
             {
-                output = current.JumpCost + 1;
+                output = current.jumpCost + 1;
             }
 
             return output;
         }
 
         //TODO : Addapt to diffrent agent size and height 
-        private bool HesJumpOpportunity(NavGrid map, int x, int y, int agentHeight)
+        private bool HesJumpOpportunity(NavGrid map, int x, int y, int maxJumpHeight)
         {
             //Check if agent is on the egde
             if (map.IsFreeNode(x - 1, y - 1) || map.IsFreeNode(x + 1, y - 1))
@@ -222,11 +215,10 @@ namespace Nav2D
             }
 
 
-            for (int i = 0; i < agentHeight; i++)
+            for (int i = 0; i < maxJumpHeight; i++)
             {
 
-                if (map.IsFreeNode(x, y + i) == false
-                    || map.IsFreeNode(x, y + i + 1) == false)
+                if (map.IsFreeNode(x, y + i) == false || map.IsFreeNode(x, y + i + 1) == false)
                 {
                     break;
                 }

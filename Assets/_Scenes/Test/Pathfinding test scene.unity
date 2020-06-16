@@ -368,7 +368,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 871787038}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 42.5, y: 18.5, z: 0}
+  m_LocalPosition: {x: 4.5, y: 4.5, z: 0}
   m_LocalScale: {x: 0.6, y: 1, z: 1}
   m_Children:
   - {fileID: 1687258585}
@@ -392,14 +392,13 @@ MonoBehaviour:
   jumpSpeed: 15
   fallSpeed: 20
   agentModel:
-    size: 1
-    height: 1
-    canJump: 1
-    maxJumpHeight: 3
+    size: 2
+    height: 2
+    maxJumpHeight: 6
     canFly: 0
-  logToConsole: 0
-  drawPath: 0
-  drawSearchPosition: 0
+  logToConsole: 1
+  drawPath: 1
+  drawSearchPosition: 1
 --- !u!212 &871787042
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -605,16 +604,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5dfd82413087da43a6b0b60e7d1347b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  map: {fileID: 1004701593}
-  startPoint: {x: 0, y: 0}
-  width: 100
-  height: 31
+  navGrid: {fileID: 1004701593}
+  startPoint: {x: -4, y: -4}
+  width: 200
+  height: 65
   collisonLayer:
     serializedVersion: 2
     m_Bits: 256
   precision: 0.5
-  showGrid: 1
-  showMap: 1
+  showScanGrid: 0
+  showNavGrid: 1
 --- !u!114 &1004701593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -627,7 +626,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c00193f6b19f2d4cb64c34cbc9520de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPosition: {x: 0, y: 0}
+  cellSize: 0.5
+  offset: {x: -4, y: -4}
   diagnonalMovement: 0
 --- !u!114 &1004701594
 MonoBehaviour:
@@ -641,7 +641,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efcd657a6e2e2ee47b748bf5ccb53ffc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridMap: {fileID: 1004701593}
+  navGrid: {fileID: 1004701593}
   tileMap: {fileID: 1282493346}
   tile: {fileID: 11400000, guid: 69e6a0cf391d56941a50af7981192305, type: 2}
 --- !u!156049354 &1004701595
@@ -664,7 +664,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1004701591}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -4, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1282493348}

@@ -7,7 +7,7 @@ namespace Nav2D.TestUtility
 {
     public class TileFillTool : MonoBehaviour
     {
-        public NavGrid gridMap;
+        public NavGrid navGrid;
         public Tilemap tileMap;
         public Tile tile;
 
@@ -17,22 +17,49 @@ namespace Nav2D.TestUtility
         {
             if (Mouse.current.rightButton.isPressed)
             {
-                if (gridMap != null && tileMap != null && tile != null)
+                if (navGrid != null && tileMap != null && tile != null)
                 {
                     Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-                    var tileMapIndex = Vector3Int.FloorToInt(mousePosition);
-                    var gridMapIndex = gridMap.FromPositionToIndex(mousePosition);
+                    var tileMapIndex = tileMap.WorldToCell(mousePosition);
+                    var gridMapIndex = navGrid.PositionToIndex(tileMap.CellToWorld(tileMapIndex));
 
                     if (tileMapIndex == lastPosition) return;
 
-                    if (gridMap.IsValideIndex(gridMapIndex.x, gridMapIndex.y) == false) return;
+                    if (navGrid.IsValideIndex(gridMapIndex.x, gridMapIndex.y) == false) return;
 
                     //Update TileMap
                     var insertTile = !tileMap.HasTile(tileMapIndex);
                     tileMap.SetTile(tileMapIndex, insertTile ? tile : null);
 
                     //Update NavGrid
-                    gridMap.SetNodeType(gridMapIndex.x, gridMapIndex.y, insertTile ? Node.NodeType.wall : Node.NodeType.free);
+
+                    var nodeType = insertTile ? NavGrid.NodeType.wall : NavGrid.NodeType.free;
+
+                    
+
+                    if(navGrid.CellSize < tileMap.cellSize.x || navGrid.CellSize < tileMap.cellSize.y)
+                    {
+                        int width = (int)(tileMap.cellSize.x / navGrid.CellSize);
+                        int height = (int)(tileMap.cellSize.y / navGrid.CellSize);
+                        
+                        for (int x = 0; x < width; x++)
+                        {
+                            for (int y = 0; y < height; y++)
+                            {
+                                navGrid.SetNode(gridMapIndex.x + x, gridMapIndex.y + y, nodeType);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        navGrid.SetNode(gridMapIndex.x, gridMapIndex.y, nodeType);
+                    }
+
+                    if (navGrid.CellSize < tileMap.cellSize.y)
+                    {
+                        
+                    }
+
 
                     lastPosition = tileMapIndex;
                 }

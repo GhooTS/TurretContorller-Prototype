@@ -5,55 +5,28 @@ namespace Nav2D
     [System.Serializable]
     public class Node
     {
-        public enum NodeType
-        {
-            wall, free
-        }
-
-        public float cost = 1.0f;
-        //TODO : Add better way to compare position without jump value (mayby splite position to position and jumpValue)
-        public Vector3Int position;
-        public NodeType type;
+        public Vector2Int position;
+        public int jumpCost;
+        public float cost = 0;
+        public float distance = 0;
 
         public int x { get { return position.x; } }
         public int y { get { return position.y; } }
-        public int JumpCost { get { return position.z; } set { position.z = value; } }
+        public float Priority { get { return cost + distance; } }
 
-        public Node(Vector2Int position, NodeType type)
+        public Node(Vector2Int position)
         {
-            this.position = new Vector3Int(position.x, position.y, 0);
-            this.type = type;
+            this.position = new Vector2Int(position.x, position.y);
         }
-        public Node(int x, int y, NodeType type)
+        public Node(int x, int y)
         {
-            position = new Vector3Int(x, y, 0);
-            this.type = type;
+            position = new Vector2Int(x, y);
         }
 
-        public Node(int x, int y, int jumpValue, NodeType type)
+        public Node(int x, int y, int jumpCost)
         {
-            position = new Vector3Int(x, y, jumpValue);
-            this.type = type;
-        }
-
-        public Vector2 GetNodeCenter()
-        {
-            return new Vector2(position.x + 0.5f, position.y + 0.5f);
-        }
-
-        public bool IsNodeOfType(NodeType nodeType)
-        {
-            return type == nodeType;
-        }
-
-        public Node Clone(int jumpValue)
-        {
-            return new Node(x, y, jumpValue, type);
-        }
-
-        public override int GetHashCode()
-        {
-            return position.GetHashCode();
+            position = new Vector2Int(x, y);
+            this.jumpCost = jumpCost;
         }
     }
 }

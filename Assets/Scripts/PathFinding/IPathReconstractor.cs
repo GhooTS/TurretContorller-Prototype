@@ -5,6 +5,6 @@ namespace Nav2D
 {
     public interface IPathReconstractor
     {
-        List<Vector2> RecreatePath(Dictionary<Node, Node> cameFrom, Node start, Node goal);
+        List<Vector2> RecreatePath(Dictionary<Vector3Int, Node> cameFrom, Node start, Node goal, NavGrid navGrid);
     }
 }

@@ -12,18 +12,18 @@ namespace Nav2D
         /// <summary>
         /// Recostract path base on direction changing
         /// </summary>
-        public List<Vector2> RecreatePath(Dictionary<Node, Node> cameFrom, Node start, Node goal)
+        public List<Vector2> RecreatePath(Dictionary<Vector3Int, Node> cameFrom, Node start, Node goal,NavGrid navGrid)
         {
             var path = new List<Vector2>();
             var current = goal;
             Vector2 currentDirection = Vector2.zero;
-            path.Add(current.GetNodeCenter());
-            while ((Vector2Int)current.position != (Vector2Int)start.position)
+            path.Add(navGrid.IndexToPosition(current.position));
+            while (current.position != start.position)
             {
-                var currentPosition = current.GetNodeCenter();
-                if (cameFrom.TryGetValue(current, out current))
+                var currentPosition = navGrid.IndexToPosition(current.position);
+                if (cameFrom.TryGetValue(new Vector3Int(current.x,current.y,current.jumpCost), out current))
                 {
-                    var nodeCenterPosition = current.GetNodeCenter();
+                    var nodeCenterPosition = navGrid.IndexToPosition(current.position);
                     var newDirection = nodeCenterPosition - currentPosition;
                     if (currentDirection != newDirection)
                     {
