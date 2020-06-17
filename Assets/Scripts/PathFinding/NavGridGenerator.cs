@@ -27,13 +27,13 @@ namespace Nav2D
         [ContextMenu("Generate map")]
         public void GenerateMap()
         {
-            navGrid.Init(width, height, offset);
+            navGrid.Init(width, height, offset,cellSize);
 
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    var hit = Physics2D.BoxCast(navGrid.IndexToPosition(new Vector2Int(x,y)), Vector2.one * navGrid.CellSize * precision, 0, Vector2.zero, 0, collisonLayer);
+                    var hit = Physics2D.BoxCast(navGrid.IndexToPosition(new Vector2Int(x, y)), Vector2.one * navGrid.CellSize * precision, 0, Vector2.zero, 0, collisonLayer);
                     var nodeType = hit.collider ? NavGrid.NodeType.wall : NavGrid.NodeType.free;
 
                     navGrid.SetNode(x, y, nodeType);
