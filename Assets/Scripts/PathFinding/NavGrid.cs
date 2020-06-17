@@ -32,11 +32,11 @@ namespace Nav2D
             height = Mathf.Max(0, height);
 
             nodes = new NodeType[width, height];
-            var boundsCenter = new Vector2((offset.x + width) * cellSize / 2, (offset.y + height) * cellSize / 2);
-            var boundsSize = new Vector2(width * cellSize, height * cellSize);
-            bounds = new Bounds(boundsCenter, boundsSize);
             this.offset = offset;
             CellSize = cellSize;
+            bounds = new Bounds(Vector3.zero, Vector3.zero);
+            bounds.Encapsulate(IndexToPosition(new Vector2Int(0, 0)) - (Vector2.one * cellSize / 2));
+            bounds.Encapsulate(IndexToPosition(new Vector2Int(width - 1, height - 1)) + (Vector2.one * cellSize / 2));
         }
 
         public void SetNode(int x, int y, NodeType node)
@@ -108,7 +108,7 @@ namespace Nav2D
 
         public Vector2Int PositionToIndex(Vector2 position)
         {
-            if (bounds.Contains(position) == false) return Vector2Int.left;
+            if (IsWithinNavGridBounds(position) == false) return Vector2Int.left;
             var distance = position - offset;
             var vectorIndex = new Vector2Int((int)(distance.x / CellSize), (int)(distance.y / CellSize));
             vectorIndex.x = Mathf.Abs(vectorIndex.x);
