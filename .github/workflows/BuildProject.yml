@@ -36,7 +36,7 @@ jobs:
         uses: webbertakken/unity-builder@v0.10
         with:
           unityVersion: 2019.3.0f6
-          targetPlatform: WebGL 
+          targetPlatform: StandaloneWindows64 
 
       # Output 
       - uses: actions/upload-artifact@v1
