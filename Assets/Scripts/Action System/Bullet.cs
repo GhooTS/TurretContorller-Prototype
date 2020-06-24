@@ -6,10 +6,12 @@ public class Bullet : MonoBehaviour
     public float speed;
     public float damaged;
     public Rigidbody2D rb2D;
+    public ReactionQueue reactionQueue;
 
     private void OnEnable()
     {
         rb2D = GetComponent<Rigidbody2D>();
+        reactionQueue.AddReaction(new WaitForObjectDestroyReaction(gameObject));
     }
 
 

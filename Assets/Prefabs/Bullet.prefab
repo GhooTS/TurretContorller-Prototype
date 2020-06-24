@@ -117,9 +117,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a24b54a6bced334899ee99df991a05e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1200
+  speed: 1600
   damaged: 20
   rb2D: {fileID: 0}
+  reactionQueue: {fileID: 11400000, guid: 8d57938b444c4714c9313f29e220a771, type: 2}
 --- !u!70 &350680189313489990
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
