@@ -36,8 +36,19 @@ jobs:
         uses: webbertakken/unity-builder@v0.10
         with:
           unityVersion: 2019.3.0f6
-          targetPlatform: StandaloneWindows64 
-
+          targetPlatform: WebGL
+          versioning: Semantic
+          
+      #Deploy
+      - name: Deploy to Github Pages
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE_BRANCH: master # The branch the action should deploy from.
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: build/WebGL # The folder the action should deploy.
+          SINGLE_COMMIT: true
+      
       # Output 
       - uses: actions/upload-artifact@v1
         with:
