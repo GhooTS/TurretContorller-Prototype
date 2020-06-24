@@ -58,10 +58,9 @@ public class ShootActionController : ActionController
     private void Shoot()
     {
         var direction = Vector2.zero;
-        var newShootAngle = rotationPoint.eulerAngles.z + Random.Range(0f, bulletSpread) * (Random.value < .50f ? -1 : 1);
+        var newShootAngle = rotationPoint.eulerAngles.z + Random.Range(0f, bulletSpread) * (Random.value <= .5f ? -1 : 1);
         direction.x = Mathf.Cos(newShootAngle * Mathf.Deg2Rad);
         direction.y = Mathf.Sin(newShootAngle * Mathf.Deg2Rad);
-        Debug.Log($"{rotateTo} :: {newShootAngle}");
 
         var instance = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.Euler(0,0,newShootAngle));
         instance.Shoot(direction);
