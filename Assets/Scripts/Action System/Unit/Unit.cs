@@ -13,7 +13,7 @@ public class Unit : MonoBehaviour
     {
         if (CanPerformedAction(action))
         {
-            currentActionPoints -= action.ActionController.cost;
+            currentActionPoints -= action.GetCost();
             actionQueue.AddAction(action);
             return true;
         }
@@ -43,6 +43,6 @@ public class Unit : MonoBehaviour
 
     public bool CanPerformedAction(Action action)
     {
-        return currentActionPoints - action.ActionController.cost >= 0;
+        return currentActionPoints - action.GetCost() >= 0;
     }
 }

@@ -3,16 +3,12 @@
 
 public class ShootActionController : ActionController
 {
-    public Bullet bulletPrefab;
     public Transform bulletSpawnPoint;
     public Transform rotationPoint;
     public float rotationSpeed = 10f; // How fast turret rotate
-    public float fireRate = 0.2f; // How fast turret shoots
-    public float bulletSpread = 12f; // in degrees
-    public int numberOfShoots = 3; // How much bullets turret shoot in one action
-    public float range = 20f;
     public RangeShaderController display;
-    
+
+    private ShootActionParameters currentParams;
     private float rotateTo;
     private Vector2 currentTarget; 
     private float nextShootTime = 0;
@@ -40,15 +36,15 @@ public class ShootActionController : ActionController
         }
     }
 
-    public override void Execute(ActionParameters parameters)
+    public override void Execute(ActionParameters parameters,ActionTarget actionTarget)
     {
-        var currentParameters = (ShootActionParameters)parameters;
-        currentTarget = currentParameters.target;
+        currentParams = (ShootActionParameters)parameters;
+        currentTarget = actionTarget.targetLocation;
         rotateTo = rotationPoint.GetLookAtAngle(currentTarget);
         rotateTo = rotateTo < 0 ? 360 - Mathf.Abs(rotateTo) : rotateTo;
         active = true;
         nextShootTime = 0;
-        bulletLeft = numberOfShoots;
+        bulletLeft = currentParams.numberOfShoots;
     }
 
     public override bool HasFinshed()
@@ -60,14 +56,14 @@ public class ShootActionController : ActionController
     private void Shoot()
     {
         var direction = Vector2.zero;
-        var newShootAngle = rotationPoint.eulerAngles.z + Random.Range(0f, bulletSpread) * (Random.value <= .5f ? -1 : 1);
+        var newShootAngle = rotationPoint.eulerAngles.z + Random.Range(0f, currentParams.bulletSpread) * (Random.value <= .5f ? -1 : 1);
         direction.x = Mathf.Cos(newShootAngle * Mathf.Deg2Rad);
         direction.y = Mathf.Sin(newShootAngle * Mathf.Deg2Rad);
 
-        var instance = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.Euler(0,0,newShootAngle));
+        var instance = Instantiate(currentParams.bulletPrefab, bulletSpawnPoint.position, Quaternion.Euler(0,0,newShootAngle));
         instance.Shoot(direction);
         bulletLeft--;
-        nextShootTime = Time.time + fireRate;
+        nextShootTime = Time.time + currentParams.fireRate;
     }
 }
 

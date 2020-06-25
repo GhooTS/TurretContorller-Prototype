@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 public class ShootActionSelector : MonoBehaviour
 {
     public LayerMask obstractionLayer;
+    public ShootActionParameters parameters;
     private Unit unit;
     private ShootActionController controller;
     private RangeShaderController display;
@@ -36,7 +37,7 @@ public class ShootActionSelector : MonoBehaviour
             target = camera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             Vector2 spawnPosition = controller.rotationPoint.position;
             Vector2 direction = (target - spawnPosition).normalized;
-            display.SetArc(direction, distanceToSpawnpoint, controller.range, controller.bulletSpread);
+            display.SetArc(direction, distanceToSpawnpoint, parameters.range, parameters.bulletSpread);
 
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
@@ -59,7 +60,8 @@ public class ShootActionSelector : MonoBehaviour
         var actionAdded = unit.EnqueueAction(new Action
         {
             ActionController = controller,
-            ActionParameters = new ShootActionParameters { target = target }
+            ActionParameters = parameters,
+            ActionTarget = new ActionTarget { targetLocation = target}
         });
     }
 

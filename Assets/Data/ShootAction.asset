@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ae24b7d31ee77e43abb9f2310660529, type: 3}
+  m_Name: ShootAction
+  m_EditorClassIdentifier: 
+  cost: 1
+  bulletPrefab: {fileID: 7898060683038982000, guid: 91ee02c492cabf6479cb9c22391adabc,
+    type: 3}
+  fireRate: 0.1
+  bulletSpread: 5
+  numberOfShoots: 7
+  range: 20

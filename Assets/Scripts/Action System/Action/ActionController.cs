@@ -7,11 +7,9 @@ using UnityEngine.Events;
 [System.Serializable]
 public abstract class ActionController : MonoBehaviour
 {
-    [Min(0)]
-    public int cost = 1;
     public bool active;
 
-    public abstract void Execute(ActionParameters parameters);
+    public abstract void Execute(ActionParameters parameters,ActionTarget actionTarget);
     public abstract bool HasFinshed();
 }
 
