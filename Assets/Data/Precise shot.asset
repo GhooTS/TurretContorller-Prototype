@@ -10,12 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ae24b7d31ee77e43abb9f2310660529, type: 3}
-  m_Name: ShootAction
+  m_Name: Precise shot
   m_EditorClassIdentifier: 
   cost: 1
-  bulletPrefab: {fileID: 7898060683038982000, guid: 91ee02c492cabf6479cb9c22391adabc,
+  actionName: Precise Shot
+  actionDescription: 
+  icon: {fileID: 21300000, guid: 1d0c184845252df44a655359de388cb8, type: 3}
+  targetable: 0
+  targetType: 1
+  targetKind: 0
+  range: 13
+  shotType: 0
+  bulletPrefab: {fileID: 7898060683038982000, guid: b886655d614ed1f4f8200fd2afd50879,
     type: 3}
   fireRate: 0.1
-  bulletSpread: 5
-  numberOfShoots: 7
-  range: 20
+  bulletSpread: 1
+  numberOfShoots: 1
