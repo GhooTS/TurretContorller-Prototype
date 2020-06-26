@@ -128,7 +128,7 @@ namespace GTCamera2D
             }
         }
 
-        private void OnDrawGizmos()
+        private void OnDrawGizmosSelected()
         {
             if (followInBounds)
             {
