@@ -26,7 +26,7 @@ public class UnitQueueExecutor : MonoBehaviour
     /// <summary>
     /// currently performed action in cycle, null means no action
     /// </summary>
-    private Action currentAction;
+    private QueuedAction currentAction;
     /// <summary>
     /// currently performed reaction in cycle, null means no reaction
     /// </summary>
