@@ -3,15 +3,21 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
+    public enum BelongTo
+    {
+        Player,
+        AI
+    }
     public int speed = 1;
     [Min(0)]
     public int maxActionPoints = 1;
+    public BelongTo controlBy;
     protected int currentActionPoints;
     protected ActionQueue actionQueue = new ActionQueue();
 
-    public bool EnqueueAction(Action action)
+    public bool EnqueueAction(QueuedAction action)
     {
-        if (CanPerformedAction(action))
+        if (CanPerformeAction(action))
         {
             currentActionPoints -= action.GetCost();
             actionQueue.AddAction(action);
@@ -21,7 +27,7 @@ public class Unit : MonoBehaviour
         return false;
     }
 
-    public Action DequeueAction()
+    public QueuedAction DequeueAction()
     {
         return actionQueue.Next();
     }
@@ -41,8 +47,13 @@ public class Unit : MonoBehaviour
         return currentActionPoints > 0;
     }
 
-    public bool CanPerformedAction(Action action)
+    public bool CanPerformeAction(QueuedAction action)
     {
         return currentActionPoints - action.GetCost() >= 0;
+    }
+
+    public bool CanPerformeAction(Action action)
+    {
+        return currentActionPoints - action.cost >= 0;
     }
 }

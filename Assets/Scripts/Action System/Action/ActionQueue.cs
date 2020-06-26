@@ -3,22 +3,22 @@ using System.Collections.Generic;
 
 public class ActionQueue
 {
-    private readonly Queue<Action> actionQueue = new Queue<Action>();
+    private readonly Queue<QueuedAction> actionQueue = new Queue<QueuedAction>();
 
     /// <summary>
     /// add action to queue
     /// </summary>
-    /// <param name="action"></param>
-    public void AddAction(Action action)
+    /// <param name="actionWrapper"></param>
+    public void AddAction(QueuedAction actionWrapper)
     {
-        actionQueue.Enqueue(action);
+        actionQueue.Enqueue(actionWrapper);
     }
 
     /// <summary>
     /// return next action in queue
     /// </summary>
     /// <returns></returns>
-    public Action Next()
+    public QueuedAction Next()
     {
         return actionQueue.Dequeue();
     }

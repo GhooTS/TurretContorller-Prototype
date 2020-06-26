@@ -9,7 +9,7 @@ public abstract class ActionController : MonoBehaviour
 {
     public bool active;
 
-    public abstract void Execute(ActionParameters parameters,ActionTarget actionTarget);
+    public abstract void Execute(Action action,ActionTarget actionTarget);
     public abstract bool HasFinshed();
 }
 

@@ -1,24 +1,37 @@
-﻿
-public class Action
+﻿using System;
+using UnityEngine;
+
+public abstract class Action : ScriptableObject
 {
-    public ActionController ActionController { get; set; }
-    public ActionParameters ActionParameters { get; set; }
-    public ActionTarget ActionTarget { get; set; }
-
-
-    public void Execute()
+    public enum ActionType
     {
-        ActionController.Execute(ActionParameters,ActionTarget);
+        Shoot,
+        Move
     }
 
-    public bool HasFinshed()
+    public enum TargetType
     {
-        return ActionController == null || ActionController.HasFinshed();
+        Unit,Location
     }
 
-    public int GetCost()
+    [Flags]
+    public enum TargetKind
     {
-        return ActionParameters.cost;
+        Ally  = 1,
+        Enemy = 2,
+        Self  = 4
     }
+
+    [Min(0)]
+    public int cost;
+    public string actionName;
+    [TextArea]
+    public string actionDescription;
+    public Sprite icon;
+    public bool targetable;
+    public TargetType targetType;
+    public TargetKind targetKind;
+    public ActionType Type { get; protected set; }
+    public float range;
 }
 
