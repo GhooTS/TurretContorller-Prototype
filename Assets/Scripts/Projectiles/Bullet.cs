@@ -7,6 +7,8 @@ public class Bullet : MonoBehaviour
     public float damaged;
     public Rigidbody2D rb2D;
     public ReactionQueue reactionQueue;
+    [HideInInspector]
+    public GameObject source;
 
     private void OnEnable()
     {
@@ -22,6 +24,12 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.gameObject == source) return;
+
+        if (collision.TryGetComponent(out Health health))
+        {
+            health.TakeDamage(damaged);
+        }
         Destroy(this.gameObject);
     }
 }

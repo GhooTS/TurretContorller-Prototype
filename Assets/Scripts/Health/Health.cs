@@ -28,7 +28,7 @@ public class Health : MonoBehaviour
         Alive = false;
     }
 
-    public virtual void DealDamage(float damage)
+    public virtual void TakeDamage(float damage)
     {
         HP.Value -= damage;
         damageTaken?.Invoke();

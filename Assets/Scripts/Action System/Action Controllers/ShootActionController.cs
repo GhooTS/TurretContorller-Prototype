@@ -67,6 +67,8 @@ public class ShootActionController : ActionController
         
 
         var instance = Instantiate(currentAction.bulletPrefab, bulletSpawnPoint.position, bulletRotation);
+        //Will only work if Shoot Action component is on same gameobject as Collider component
+        instance.source = gameObject;
         instance.Shoot(direction);
         bulletsLeft--;
         nextShootTime = Time.time + currentAction.fireRate;
