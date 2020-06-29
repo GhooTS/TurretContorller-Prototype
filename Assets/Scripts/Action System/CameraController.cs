@@ -45,4 +45,25 @@ public class CameraController : MonoBehaviour
         actionSource.transform.position = source;
         actionCamera.AddTarget(actionSource);
     }
+
+    public void StartTransition(GameObjectBounds source, Vector2 targetLocation)
+    {
+        actionCamera.ClearAllTargets();
+        actionCamera.AddTarget(source);
+        target.transform.position = targetLocation;
+        actionCamera.AddTarget(target);
+    }
+
+    public void StartTransition(GameObjectBounds source, GameObjectBounds target)
+    {
+        actionCamera.ClearAllTargets();
+        actionCamera.AddTarget(source);
+        actionCamera.AddTarget(target);
+    }
+
+    public void StartTransition(Transform source)
+    {
+        actionCamera.ClearAllTargets();
+        actionCamera.AddTarget(source.GetComponent<GameObjectBounds>());
+    }
 }
