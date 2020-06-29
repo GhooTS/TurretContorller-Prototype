@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class LocationTargetSelector : MonoBehaviour
 {
+    public UnityEvent activated;
+    public UnityEvent targetSelected;
+    public UnityEvent operationCanceled;
     private Unit actionSource;
     private ActionContainer actionContainer;
     private bool isActive = false;
@@ -38,6 +42,7 @@ public class LocationTargetSelector : MonoBehaviour
     {
         actionSource.EnqueueAction(actionContainer.GetQueueAction(new ActionTarget { targetLocation = location }));
         Deactivate();
+        targetSelected?.Invoke();
     }
 
     public void Activate(Unit actionSource, ActionContainer actionContainer)
@@ -46,6 +51,7 @@ public class LocationTargetSelector : MonoBehaviour
         this.actionContainer = actionContainer;
         actionContainer.ActiveView(actionSource);
         isActive = true;
+        activated?.Invoke();
     }
 
     private void Deactivate()
@@ -59,6 +65,7 @@ public class LocationTargetSelector : MonoBehaviour
     private void CancelAction()
     {
         Deactivate();
+        operationCanceled?.Invoke();
     }
 
 }
