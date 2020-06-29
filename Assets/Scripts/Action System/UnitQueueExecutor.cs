@@ -1,18 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-
 public class UnitQueueExecutor : MonoBehaviour
 {
+    [SerializeField]
+    private ReactionQueue reactionQueue;
     public UnityEvent CycleStarted;
     [Tooltip("Invoked after all entities performed all assigned action, and there is no reaction left to execute")]
     public UnityEvent CycleEnded;
     [Tooltip("Invoked after entity performed all assigned action ,and there is no reaction left to execute")]
-    public UnityEvent EntityTourEnded;
-
+    public UnityEvent EntityTurnEnded;
+    public UnityEvent ActionEnded;
+    public UnityEvent ReactionEnded;
+    
     /// <summary>
     /// Currently active unit in cycle
     /// </summary>
@@ -20,17 +22,17 @@ public class UnitQueueExecutor : MonoBehaviour
     public bool InCycle { get; private set; } = false;
 
     private readonly UnitQueue unitQueue = new UnitQueue();
-    [SerializeField]
-    private ReactionQueue reactionQueue;
     private List<Unit> entities;
     /// <summary>
     /// currently performed action in cycle, null means no action
     /// </summary>
-    private QueuedAction currentAction;
+    public QueuedAction CurrentAction { get; private set; }
     /// <summary>
     /// currently performed reaction in cycle, null means no reaction
     /// </summary>
-    private Reaction currentReaction;
+    public Reaction CurrentReaction { get; private set; }
+
+
 
     private void Start()
     {
@@ -41,50 +43,6 @@ public class UnitQueueExecutor : MonoBehaviour
         }
     }
 
-
-    private void Update()
-    {
-        if (InCycle)
-        {
-            MoveToNextUnitOrEndCycle();
-        }
-    }
-
-
-    private void MoveToNextUnitOrEndCycle()
-    {
-        //Early return if action hasn't finished
-        if (currentAction != null && currentAction.ActionController.HasFinshed() == false) return;
-
-        //Early return if reaction hasn't finished
-        if (currentReaction != null && currentReaction.Finshed() == false) return;
-
-        if (reactionQueue.HasNext()) 
-        {
-            currentReaction = reactionQueue.Next();
-            currentReaction.Start();
-        }
-        else if (CurrentActive != null && CurrentActive.HasNextAction())
-        {
-            reactionQueue.Reset(true);
-            currentAction = CurrentActive.DequeueAction();
-            currentAction.Execute();
-        }
-        else if (CurrentActive != null)
-        {
-            EntityTourEnded?.Invoke();
-
-            if (unitQueue.HasNext())
-            {
-                CurrentActive = unitQueue.Next();
-            }
-            else
-            {
-                EndCycle();
-            }
-        }
-    }
-
     /// <summary>
     /// Starts next cycle with all assign action in 
     /// </summary>
@@ -92,9 +50,9 @@ public class UnitQueueExecutor : MonoBehaviour
     {
         if (InCycle) return;
 
-        
+
         unitQueue.CreateNewQueue(entities);
-        
+
         CurrentActive = unitQueue.Next();
         InCycle = true;
         CycleStarted?.Invoke();
@@ -109,9 +67,78 @@ public class UnitQueueExecutor : MonoBehaviour
         }
 
         CurrentActive = null;
-        currentAction = null;
-        currentReaction = null;
+        CurrentAction = null;
+        CurrentReaction = null;
         CycleEnded?.Invoke();
+    }
+
+    public void MoveToNext()
+    {
+        if (reactionQueue.HasNext())
+        {
+            CurrentReaction = reactionQueue.Next();
+        }
+        else if (CurrentActive != null && CurrentActive.HasNextAction())
+        {
+            reactionQueue.Reset(true);
+            CurrentAction = CurrentActive.DequeueAction();
+        }
+        else if (CurrentActive != null)
+        {
+            EntityTurnEnded?.Invoke();
+
+            if (unitQueue.HasNext())
+            {
+                CurrentActive = unitQueue.Next();
+            }
+            else
+            {
+                EndCycle();
+            }
+        }
+    }
+
+    public void StartNextActionOrReaction()
+    {
+        if (CurrentReaction != null)
+        {
+            CurrentReaction.Start();
+        }
+        else if (CurrentActive != null && CurrentAction != null)
+        {
+            CurrentAction.Execute();
+        }
+    }
+
+
+    public void EndActionOrReaction()
+    {
+        if (CurrentActionFinshed() && CurrentAction != null)
+        {
+            CurrentAction = null;
+            ActionEnded?.Invoke();
+        }
+        else if (CurrentReactionFinshed() && CurrentReaction != null)
+        {
+            CurrentReaction = null;
+            ReactionEnded?.Invoke();
+        }
+    }
+
+
+    public bool HasActionOrReaction()
+    {
+        return CurrentAction != null || CurrentReaction != null;
+    }
+
+    public bool CurrentActionFinshed()
+    {
+        return CurrentAction == null || CurrentAction.HasFinshed() && CurrentAction.HasStarted;
+    }
+
+    public bool CurrentReactionFinshed()
+    {
+        return CurrentReaction == null || CurrentReaction.Finshed();
     }
 
 }
