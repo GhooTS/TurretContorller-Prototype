@@ -83,7 +83,7 @@ public class UnitQueueExecutor : MonoBehaviour
             reactionQueue.Reset(true);
             CurrentAction = CurrentActive.DequeueAction();
         }
-        else if (CurrentActive != null)
+        else
         {
             EntityTurnEnded?.Invoke();
 
