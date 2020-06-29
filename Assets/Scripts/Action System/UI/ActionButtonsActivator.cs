@@ -38,9 +38,20 @@ public class ActionButtonsActivator : MonoBehaviour
         selection.OnDiselected.RemoveListener(HideButtons);
     }
 
-    private void ShowButtons()
+
+    public void UpdateButtons()
     {
-        if(selection.HasSelection() && selection.selected.TryGetComponent(out Unit unit) && selection.selected.TryGetComponent(out ActionManager manager))
+        foreach (var button in actionButtons)
+        {
+            button.UpdateSelf();
+        }
+    }
+
+    public void ShowButtons()
+    {
+        HideButtons();
+
+        if (selection.HasSelection() && selection.selected.TryGetComponent(out Unit unit) && selection.selected.TryGetComponent(out ActionManager manager))
         {
             for (int i = 0; i < manager.actionContainers.Length; i++)
             {
@@ -49,7 +60,7 @@ public class ActionButtonsActivator : MonoBehaviour
         }
     }
 
-    private void HideButtons()
+    public void HideButtons()
     {
         for (int i = 0; i < actionButtons.Length; i++)
         {

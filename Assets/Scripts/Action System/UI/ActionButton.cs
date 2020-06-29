@@ -39,6 +39,13 @@ public class ActionButton : MonoBehaviour
         gameObject.SetActive(true);
     }
 
+    public void UpdateSelf()
+    {
+        if (actionContainer == null) return;
+
+        button.interactable = unit.CanPerformeAction(this.actionContainer.action);
+    }
+
     private void ActiveTargetSelection()
     {
         if(unit != null && actionContainer != null)
