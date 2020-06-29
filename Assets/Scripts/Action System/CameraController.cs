@@ -38,4 +38,11 @@ public class CameraController : MonoBehaviour
         target.transform.position = targetLocation;
         actionCamera.AddTarget(target);
     }
+
+    public void StartTransition(Vector2 source)
+    {
+        actionCamera.ClearAllTargets();
+        actionSource.transform.position = source;
+        actionCamera.AddTarget(actionSource);
+    }
 }

@@ -14,7 +14,7 @@ public class GameController : MonoBehaviour
             {
                 unitQueueExecutor.EndActionOrReaction();
                 unitQueueExecutor.MoveToNext();
-                if (unitQueueExecutor.CurrentAction != null)
+                if (unitQueueExecutor.CurrentAction != null || (unitQueueExecutor.CurrentReaction != null && unitQueueExecutor.CurrentReaction.RequierFocus))
                 {
                     StartCameraTransition();
                 }
@@ -33,7 +33,14 @@ public class GameController : MonoBehaviour
 
     private IEnumerator WaitForCameraTransition()
     {
-        cameraController.StartTransition(unitQueueExecutor.CurrentActive.transform.position, unitQueueExecutor.CurrentAction.ActionTarget.targetLocation);
+        if (unitQueueExecutor.CurrentAction != null)
+        {
+            cameraController.StartTransition(unitQueueExecutor.CurrentActive.transform.position, unitQueueExecutor.CurrentAction.ActionTarget.targetLocation);
+        }
+        else if(unitQueueExecutor.CurrentReaction != null)
+        {
+            cameraController.StartTransition(unitQueueExecutor.CurrentReaction.Target);
+        }
         yield return new WaitForSeconds(cameraController.transitionTime);
         unitQueueExecutor.StartNextActionOrReaction();
     }
