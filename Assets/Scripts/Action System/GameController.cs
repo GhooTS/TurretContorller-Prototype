@@ -3,24 +3,24 @@ using System.Collections;
 
 public class GameController : MonoBehaviour
 {
-    public UnitQueueExecutor unitQueueExecutor;
+    public UnitQueueExecutor unitQueue;
     public CameraController cameraController;
 
     private void Update()
     {
-        if (unitQueueExecutor.InCycle)
+        if (unitQueue.InCycle)
         {
-            if (unitQueueExecutor.CurrentActionFinshed() && unitQueueExecutor.CurrentReactionFinshed())
+            if (unitQueue.CurrentActionFinshed() && unitQueue.CurrentReactionFinshed())
             {
-                unitQueueExecutor.EndActionOrReaction();
-                unitQueueExecutor.MoveToNext();
-                if (unitQueueExecutor.CurrentAction != null || (unitQueueExecutor.CurrentReaction != null && unitQueueExecutor.CurrentReaction.RequierFocus))
+                unitQueue.EndActionOrReaction();
+                unitQueue.MoveToNext();
+                if (unitQueue.HasAction()|| (unitQueue.HasReaction() && unitQueue.CurrentReaction.RequierFocus))
                 {
                     StartCameraTransition();
                 }
                 else
                 {
-                    unitQueueExecutor.StartNextActionOrReaction();
+                    unitQueue.StartNextActionOrReaction();
                 }
             }
         }
@@ -33,15 +33,15 @@ public class GameController : MonoBehaviour
 
     private IEnumerator WaitForCameraTransition()
     {
-        if (unitQueueExecutor.CurrentAction != null)
+        if (unitQueue.HasAction())
         {
-            cameraController.StartTransition(unitQueueExecutor.CurrentActive.transform.position, unitQueueExecutor.CurrentAction.ActionTarget.targetLocation);
+            cameraController.StartTransition(unitQueue.GetCurrentSource(), unitQueue.GetCurrentTarget());
         }
-        else if(unitQueueExecutor.CurrentReaction != null)
+        else if(unitQueue.HasReaction())
         {
-            cameraController.StartTransition(unitQueueExecutor.CurrentReaction.Target);
+            cameraController.StartTransition(unitQueue.GetCurrentSource());
         }
         yield return new WaitForSeconds(cameraController.transitionTime);
-        unitQueueExecutor.StartNextActionOrReaction();
+        unitQueue.StartNextActionOrReaction();
     }
 }

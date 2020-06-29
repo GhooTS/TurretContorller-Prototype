@@ -24,11 +24,11 @@ public class UnitQueueExecutor : MonoBehaviour
     private readonly UnitQueue unitQueue = new UnitQueue();
     private List<Unit> entities;
     /// <summary>
-    /// currently performed action in cycle, null means no action
+    /// currently performe action in cycle, null means no action
     /// </summary>
     public QueuedAction CurrentAction { get; private set; }
     /// <summary>
-    /// currently performed reaction in cycle, null means no reaction
+    /// currently performe reaction in cycle, null means no reaction
     /// </summary>
     public Reaction CurrentReaction { get; private set; }
 
@@ -100,11 +100,11 @@ public class UnitQueueExecutor : MonoBehaviour
 
     public void StartNextActionOrReaction()
     {
-        if (CurrentReaction != null)
+        if (HasReaction())
         {
             CurrentReaction.Start();
         }
-        else if (CurrentActive != null && CurrentAction != null)
+        else if (CurrentActive != null && HasAction())
         {
             CurrentAction.Execute();
         }
@@ -113,12 +113,12 @@ public class UnitQueueExecutor : MonoBehaviour
 
     public void EndActionOrReaction()
     {
-        if (CurrentActionFinshed() && CurrentAction != null)
+        if (CurrentActionFinshed() && HasAction())
         {
             CurrentAction = null;
             ActionEnded?.Invoke();
         }
-        else if (CurrentReactionFinshed() && CurrentReaction != null)
+        else if (CurrentReactionFinshed() && HasReaction())
         {
             CurrentReaction = null;
             ReactionEnded?.Invoke();
@@ -128,17 +128,37 @@ public class UnitQueueExecutor : MonoBehaviour
 
     public bool HasActionOrReaction()
     {
-        return CurrentAction != null || CurrentReaction != null;
+        return HasAction() || HasReaction();
     }
 
     public bool CurrentActionFinshed()
     {
-        return CurrentAction == null || CurrentAction.HasFinshed() && CurrentAction.HasStarted;
+        return HasAction() == false || CurrentAction.HasFinshed() && CurrentAction.HasStarted;
     }
 
     public bool CurrentReactionFinshed()
     {
-        return CurrentReaction == null || CurrentReaction.Finshed();
+        return HasReaction() == false || CurrentReaction.Finshed();
+    }
+
+    public bool HasAction()
+    {
+        return CurrentAction != null;
+    }
+
+    public bool HasReaction()
+    {
+        return CurrentReaction != null;
+    }
+
+    public Vector2 GetCurrentSource()
+    {
+        return HasAction() ? (Vector2)CurrentActive.transform.position : (HasReaction() && CurrentReaction.RequierFocus ? CurrentReaction.Target : Vector2.zero);
+    }
+
+    public Vector2 GetCurrentTarget()
+    {
+        return HasAction() ? CurrentAction.ActionTarget.targetLocation : Vector2.zero;
     }
 
 }
