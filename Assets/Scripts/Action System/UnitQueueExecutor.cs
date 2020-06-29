@@ -7,13 +7,15 @@ public class UnitQueueExecutor : MonoBehaviour
 {
     [SerializeField]
     private ReactionQueue reactionQueue;
+    [SerializeField]
+    private UnitsCollection units;
     public UnityEvent CycleStarted;
     [Tooltip("Invoked after all entities performed all assigned action, and there is no reaction left to execute")]
     public UnityEvent CycleEnded;
     [Tooltip("Invoked after entity performed all assigned action ,and there is no reaction left to execute")]
-    public UnityEvent EntityTurnEnded;
-    public UnityEvent ActionEnded;
-    public UnityEvent ReactionEnded;
+    public UnityEvent unitTurnEnded;
+    public UnityEvent actionEnded;
+    public UnityEvent reactionEnded;
     
     /// <summary>
     /// Currently active unit in cycle
@@ -22,7 +24,6 @@ public class UnitQueueExecutor : MonoBehaviour
     public bool InCycle { get; private set; } = false;
 
     private readonly UnitQueue unitQueue = new UnitQueue();
-    private List<Unit> entities;
     /// <summary>
     /// currently performe action in cycle, null means no action
     /// </summary>
@@ -36,8 +37,7 @@ public class UnitQueueExecutor : MonoBehaviour
 
     private void Start()
     {
-        entities = FindObjectsOfType<Unit>().ToList();
-        foreach (var entity in entities)
+        foreach (var entity in units)
         {
             entity.ResetActionPoint();
         }
@@ -51,7 +51,7 @@ public class UnitQueueExecutor : MonoBehaviour
         if (InCycle) return;
 
 
-        unitQueue.CreateNewQueue(entities);
+        unitQueue.CreateNewQueue(units);
 
         CurrentActive = unitQueue.Next();
         InCycle = true;
@@ -61,9 +61,9 @@ public class UnitQueueExecutor : MonoBehaviour
     private void EndCycle()
     {
         InCycle = false;
-        foreach (var entity in entities)
+        foreach (var unit in units)
         {
-            entity.ResetActionPoint();
+            unit.ResetActionPoint();
         }
 
         CurrentActive = null;
@@ -85,7 +85,7 @@ public class UnitQueueExecutor : MonoBehaviour
         }
         else
         {
-            EntityTurnEnded?.Invoke();
+            unitTurnEnded?.Invoke();
 
             if (unitQueue.HasNext())
             {
@@ -116,12 +116,12 @@ public class UnitQueueExecutor : MonoBehaviour
         if (CurrentActionFinshed() && HasAction())
         {
             CurrentAction = null;
-            ActionEnded?.Invoke();
+            actionEnded?.Invoke();
         }
         else if (CurrentReactionFinshed() && HasReaction())
         {
             CurrentReaction = null;
-            ReactionEnded?.Invoke();
+            reactionEnded?.Invoke();
         }
     }
 

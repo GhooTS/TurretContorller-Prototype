@@ -4,27 +4,14 @@ using System.Linq;
 
 public class UnitTargetSelector : MonoBehaviour
 {
-    public List<Unit> units;
+    public UnitsCollection units;
     public Unit CurrentTarget { get { return units[currentTargetIndex]; } }
+    public bool IsActive { get; private set; } = false;
 
     private int currentTargetIndex = -1;
     private Unit actionSource;
     private ActionController actionController;
     private Action action;
-    private bool isActive = false;
-
-
-    public void Awake()
-    {
-        FindAllUnits();
-    }
-
-    //TEMPORARY SOLUTION-----------------
-    public void FindAllUnits()
-    {
-        units = FindObjectsOfType<Unit>().ToList();
-    }
-    //------------------------------------
 
     public void Applay()
     {
@@ -42,7 +29,7 @@ public class UnitTargetSelector : MonoBehaviour
         this.actionSource = actionSource;
         this.actionController = actionController;
         this.action = action;
-        isActive = true;
+        IsActive = true;
     }
 
     private void Deactivate()
@@ -50,10 +37,10 @@ public class UnitTargetSelector : MonoBehaviour
         this.actionSource = null;
         this.actionController = null;
         this.action = null;
-        isActive = false;
+        IsActive = false;
     }
 
-    private void SwitchTarget()
+    public void SwitchTarget()
     {
         //loop around from current target to next, if exist
         for (int i = currentTargetIndex + 1; i != currentTargetIndex; i++)

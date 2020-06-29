@@ -3,31 +3,41 @@ using System.Collections.Generic;
 
 public class UnitQueue
 {
-    private readonly SimplePriorityQueue<Unit, int> entityTourQueue = new SimplePriorityQueue<Unit, int>();
+    private readonly SimplePriorityQueue<Unit, int> unitsTurnQueue = new SimplePriorityQueue<Unit, int>();
 
-    public int Count { get { return entityTourQueue.Count; } }
+    public int Count { get { return unitsTurnQueue.Count; } }
 
     public bool HasNext()
     {
-        return entityTourQueue.Count != 0;
+        return unitsTurnQueue.Count != 0;
     }
 
     public Unit Next()
     {
-        return entityTourQueue.Dequeue();
+        return unitsTurnQueue.Dequeue();
     }
 
-    public void CreateNewQueue(List<Unit> enitities)
+    public void CreateNewQueue(List<Unit> units)
     {
-        entityTourQueue.Clear();
-        foreach (var entity in enitities)
+        unitsTurnQueue.Clear();
+        foreach (var unit in units)
         {
-            entityTourQueue.Enqueue(entity, -entity.speed);
+            unitsTurnQueue.Enqueue(unit, -unit.speed);
         }
     }
 
+    public void CreateNewQueue(UnitsCollection units)
+    {
+        unitsTurnQueue.Clear();
+        foreach (var unit in units)
+        {
+            unitsTurnQueue.Enqueue(unit, -unit.speed);
+        }
+    }
+
+
     public bool Remove(Unit entityController)
     {
-        return entityTourQueue.TryRemove(entityController);
+        return unitsTurnQueue.TryRemove(entityController);
     }
 }
