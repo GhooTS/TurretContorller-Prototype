@@ -90,22 +90,7 @@ namespace GTCamera2D
             }
         }
 
-        public void AddTarget(GameObjectBounds target)
-        {
-            if (targets.Contains(target) == false)
-            {
-                targets.Add(target);
-            }
-            else
-            {
-                Debug.Log($"{target.name} already in follow list");
-            }
-        }
-
-        public void RemoveTarget(GameObjectBounds target)
-        {
-            targets.Remove(target);
-        }
+        
 
         private void FollowTargets(Vector3 targetLocation)
         {
@@ -126,6 +111,29 @@ namespace GTCamera2D
                 cameraZoom = Mathf.Clamp(cameraZoom, minZoom, maxZoom);
                 camera.orthographicSize = Mathf.Lerp(camera.orthographicSize, cameraZoom + margin, zoomSmoothTime);
             }
+        }
+
+
+        public void AddTarget(GameObjectBounds target)
+        {
+            if (targets.Contains(target) == false)
+            {
+                targets.Add(target);
+            }
+            else
+            {
+                Debug.Log($"{target.name} already in follow list");
+            }
+        }
+
+        public void RemoveTarget(GameObjectBounds target)
+        {
+            targets.Remove(target);
+        }
+
+        public void ClearAllTargets()
+        {
+            targets.Clear();
         }
 
         private void OnDrawGizmosSelected()

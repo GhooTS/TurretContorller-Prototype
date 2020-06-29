@@ -16,6 +16,8 @@ namespace GTCamera2D
         public bool countCameraSize = false;
         public MovementLimiter moveLimitation;
         public bool useUnscaledDeltaTime = false;
+        public float zoom = 8f;
+        public float zoomSmoothTime = 0.15f;
         private Vector2 playerInput;
 
         private void Awake()
@@ -30,6 +32,7 @@ namespace GTCamera2D
         private void LateUpdate()
         {
             Move();
+            camera.orthographicSize = Mathf.Lerp(camera.orthographicSize,zoom,zoomSmoothTime);
         }
 
         private void Move()
