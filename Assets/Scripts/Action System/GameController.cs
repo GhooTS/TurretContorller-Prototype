@@ -35,7 +35,14 @@ public class GameController : MonoBehaviour
     {
         if (unitQueue.HasAction())
         {
-            cameraController.StartTransition(unitQueue.GetCurrentSource(), unitQueue.GetCurrentTarget());
+            if (unitQueue.CurrentActive.TryGetComponent(out GameObjectBounds bounds)) 
+            {
+                cameraController.StartTransition(bounds, unitQueue.GetCurrentTarget());
+            }
+            else
+            {
+                cameraController.StartTransition(unitQueue.GetCurrentSource(), unitQueue.GetCurrentTarget());
+            }
         }
         else if(unitQueue.HasReaction())
         {
