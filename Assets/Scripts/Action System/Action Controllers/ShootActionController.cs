@@ -16,6 +16,7 @@ public class ShootActionController : ActionController
     /// Distance from rotation point to the spawn point
     /// </summary>
     public float SpawnPointDistance { get; private set; }
+    private float bulletTravelTime;
 
     private void Start()
     {
@@ -53,6 +54,7 @@ public class ShootActionController : ActionController
         active = true;
         nextShootTime = 0;
         bulletsLeft = currentAction.numberOfShoots;
+        bulletTravelTime = currentAction.range / (currentAction.bulletPrefab.speed * Time.fixedDeltaTime);
     }
 
     public override bool HasFinshed()
@@ -79,6 +81,7 @@ public class ShootActionController : ActionController
         //Will only work if Shoot Action component is on same gameobject as Collider component
         instance.source = gameObject;
         instance.Shoot(direction);
+        Destroy(instance.gameObject, bulletTravelTime);
         bulletsLeft--;
         nextShootTime = Time.time + currentAction.fireRate;
     }
