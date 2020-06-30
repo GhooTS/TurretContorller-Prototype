@@ -4,10 +4,16 @@
 public class PreciseShotPreview : ActionPreview
 {
     public LayerMask layerMask;
-    public LineRenderer display;
-    private LineRenderer instance;
+    public PreciseShotPreviewDisplay display;
+    private PreciseShotPreviewDisplay instance;
     private ShootAction action;
     private ShootActionController controller;
+
+    public override void DetachPreview()
+    {
+        instance.SetPreviewMode(ActionPreviewDisplay.PreviewMode.Visible);
+        instance = null;
+    }
 
     public override void Clear()
     {
@@ -19,9 +25,8 @@ public class PreciseShotPreview : ActionPreview
         this.action = action as ShootAction;
         this.controller = controller as ShootActionController;
         instance = Instantiate(display);
-        instance.positionCount = 2;
-        instance.SetPosition(0,Vector2.zero);
-        instance.SetPosition(1,Vector2.zero);
+        instance.Init();
+        instance.SetPreviewMode(ActionPreviewDisplay.PreviewMode.Focus);
     }
 
     public override void UpdateView(Vector2 location)
@@ -30,7 +35,6 @@ public class PreciseShotPreview : ActionPreview
         var hit = Physics2D.Raycast(startPoint,(location - startPoint),action.range,layerMask);
         location = hit.collider == null ? startPoint + (location - startPoint).normalized * action.range : hit.point;
 
-        instance.SetPosition(0, startPoint);
-        instance.SetPosition(1, location);
+        instance.SetDisplayTarget(startPoint,location);
     }
 }

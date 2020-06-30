@@ -12,4 +12,5 @@ public abstract class ActionPreviewDisplay : MonoBehaviour
     public PreviewMode Mode { get; protected set; }
     public abstract void SetPreviewMode(PreviewMode mode);
     public abstract void DestroyPreview();
+    public abstract void Init();
 }

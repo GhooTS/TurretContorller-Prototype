@@ -10,6 +10,13 @@ public class PreciseShotPreviewDisplay : ActionPreviewDisplay
     public GradientReference active;
 
 
+    public override void Init()
+    {
+        display.positionCount = 2;
+        display.SetPosition(0, Vector2.zero);
+        display.SetPosition(1, Vector2.zero);
+    }
+
     public override void DestroyPreview()
     {
         Destroy(gameObject);

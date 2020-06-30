@@ -23,6 +23,11 @@ public class MultiShotPreview : ActionPreview
         Destroy(instance.gameObject);
     }
 
+    public override void DetachPreview()
+    {
+        //Detach logic
+    }
+
     public override void UpdateView(Vector2 location)
     {
         instance.SetArc((location - (Vector2)controller.rotationPoint.position).normalized, 0, action.range, action.bulletSpread);

@@ -10,4 +10,5 @@ public abstract class ActionPreview : ScriptableObject
     /// Clear view
     /// </summary>
     public abstract void Clear();
+    public abstract void DetachPreview();
 }
