@@ -25,7 +25,7 @@ public class AreaShotPreviewDisplay : ActionPreviewDisplay
         switch (mode)
         {
             case PreviewMode.Hidden:
-                display.enabled = false;
+                display.SetArc(Vector2.zero, 0, 0, 0);
                 break;
             case PreviewMode.Visible:
                 display.enabled = true;

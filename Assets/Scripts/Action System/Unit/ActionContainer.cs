@@ -10,7 +10,17 @@ public class ActionContainer
 
     public QueuedAction GetQueuedAction(ActionTarget actionTarget)
     {
-        return new QueuedAction { Action = action, ActionController = controller, ActionTarget = actionTarget };
+        var output = new QueuedAction
+        {
+            Action = action,
+            ActionController = controller,
+            ActionTarget = actionTarget,
+            Display = preview.GetPreviewDisplay()
+        };
+
+        preview.DetachPreview();
+
+        return output;
     }
 
     public void ActivePreview(Unit unit)

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c841145e9551f7b41b7c2b205381ef91, type: 3}
-  m_Name: MultiShot View
+  m_Name: AreaShotPreview
   m_EditorClassIdentifier: 
   layerMask:
     serializedVersion: 2
     m_Bits: 1335
-  display: {fileID: 6379530025123773289, guid: 68a5a645509e6d94ea84b7dc3b02ed63, type: 3}
+  display: {fileID: 1624754782760288676, guid: 1c9177cb1e0b5ca47807678b6e82ecc9, type: 3}

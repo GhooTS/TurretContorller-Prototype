@@ -56,7 +56,6 @@ public class LocationTargetSelector : MonoBehaviour
 
     private void Deactivate()
     {
-        actionContainer.ClearPreview();
         actionSource = null;
         actionContainer = null;
         isActive = false;
@@ -64,6 +63,7 @@ public class LocationTargetSelector : MonoBehaviour
 
     private void CancelAction()
     {
+        actionContainer.ClearPreview();
         Deactivate();
         operationCanceled?.Invoke();
     }
