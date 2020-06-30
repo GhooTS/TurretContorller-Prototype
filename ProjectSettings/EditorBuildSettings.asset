@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Scenes/Camera Integration.unity
-    guid: 1f9c0064c37e2f94bbb7dc7ae386cfa3
+    path: Assets/_Scenes/Game play test level.unity
+    guid: 8b036159cb6ed5542a5fe014ac37653d
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 3d3ea638f25234b40a4bb663b29efb15,
       type: 2}
