@@ -31,7 +31,7 @@ public class PreciseShotPreview : ActionPreview
 
     public override void UpdateView(Vector2 location)
     {
-        var startPoint = (Vector2)controller.rotationPoint.position;
+        var startPoint = controller.GetActionStartPosition(location);
         var hit = Physics2D.Raycast(startPoint,(location - startPoint),action.range,layerMask);
         location = hit.collider == null ? startPoint + (location - startPoint).normalized * action.range : hit.point;
 

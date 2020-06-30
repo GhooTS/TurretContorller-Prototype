@@ -15,7 +15,7 @@ public class AreaShotPreview : ActionPreview
         this.action = action as ShootAction;
         this.controller = controller as ShootActionController;
         instance = Instantiate(display,this.controller.rotationPoint.position,Quaternion.identity);
-        instance.SetDisplayTarget(Vector2.right, 0, this.action.range, this.action.bulletSpread);
+        instance.SetDisplayTarget(Vector2.right, this.controller.SpawnPointDistance, this.action.range + this.controller.SpawnPointDistance, this.action.bulletSpread);
         instance.SetPreviewMode(ActionPreviewDisplay.PreviewMode.Focus);
     }
 
@@ -37,6 +37,6 @@ public class AreaShotPreview : ActionPreview
 
     public override void UpdateView(Vector2 location)
     {
-        instance.SetDisplayTarget((location - (Vector2)controller.rotationPoint.position).normalized, 0, action.range, action.bulletSpread);
+        instance.SetDisplayTarget((location - (Vector2)controller.rotationPoint.position).normalized, controller.SpawnPointDistance, action.range + controller.SpawnPointDistance, action.bulletSpread);
     }
 }
