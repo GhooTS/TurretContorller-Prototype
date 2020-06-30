@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           lfs: true
-    
+          submodules: 'https://github.com/GhooTS/GTScriptableVariable.git'    
       # Cache
       - uses: actions/cache@v1.1.0
         with:
