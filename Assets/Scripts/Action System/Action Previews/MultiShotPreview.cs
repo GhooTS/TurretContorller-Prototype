@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "Action System/View/MultiShot")]
-public class MultiShotView : ActionView
+public class MultiShotPreview : ActionPreview
 {
     public LayerMask layerMask;
     public RangeShaderController display;

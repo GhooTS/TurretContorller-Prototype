@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "Action System/View/Precise Shot")]
-public class PreciseShotView : ActionView
+public class PreciseShotPreview : ActionPreview
 {
     public LayerMask layerMask;
     public LineRenderer display;

@@ -4,27 +4,27 @@
 public class ActionContainer
 {
     public Action action;
-    public ActionView view;
+    public ActionPreview preview;
     public ActionController controller;
 
 
-    public QueuedAction GetQueueAction(ActionTarget actionTarget)
+    public QueuedAction GetQueuedAction(ActionTarget actionTarget)
     {
         return new QueuedAction { Action = action, ActionController = controller, ActionTarget = actionTarget };
     }
 
-    public void ActiveView(Unit unit)
+    public void ActivePreview(Unit unit)
     {
-        view.Activate(unit, action, controller);
+        preview.Activate(unit, action, controller);
     }
 
-    public void UpdateView(Vector2 location)
+    public void UpdatePreview(Vector2 location)
     {
-        view.UpdateView(location);
+        preview.UpdateView(location);
     }
 
-    public void ClearView()
+    public void ClearPreview()
     {
-        view.Clear();
+        preview.Clear();
     }
 }

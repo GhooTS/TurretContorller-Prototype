@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public abstract class ActionView : ScriptableObject
+public abstract class ActionPreview : ScriptableObject
 {
 
     public abstract void Activate(Unit unit,Action action,ActionController controller);

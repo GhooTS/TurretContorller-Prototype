@@ -25,7 +25,7 @@ public class LocationTargetSelector : MonoBehaviour
 
         location = camera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
 
-        actionContainer.UpdateView(location);
+        actionContainer.UpdatePreview(location);
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
@@ -40,7 +40,7 @@ public class LocationTargetSelector : MonoBehaviour
 
     public void Applay()
     {
-        actionSource.EnqueueAction(actionContainer.GetQueueAction(new ActionTarget { targetLocation = location }));
+        actionSource.EnqueueAction(actionContainer.GetQueuedAction(new ActionTarget { targetLocation = location }));
         Deactivate();
         targetSelected?.Invoke();
     }
@@ -49,14 +49,14 @@ public class LocationTargetSelector : MonoBehaviour
     {
         this.actionSource = actionSource;
         this.actionContainer = actionContainer;
-        actionContainer.ActiveView(actionSource);
+        actionContainer.ActivePreview(actionSource);
         isActive = true;
         activated?.Invoke();
     }
 
     private void Deactivate()
     {
-        actionContainer.ClearView();
+        actionContainer.ClearPreview();
         actionSource = null;
         actionContainer = null;
         isActive = false;
