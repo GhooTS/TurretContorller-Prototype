@@ -4,8 +4,8 @@
 public class MultiShotPreview : ActionPreview
 {
     public LayerMask layerMask;
-    public RangeShaderController display;
-    private RangeShaderController instance;
+    public AreaShotPreviewDisplay display;
+    private AreaShotPreviewDisplay instance;
     private ShootAction action;
     private ShootActionController controller;
 
@@ -15,7 +15,7 @@ public class MultiShotPreview : ActionPreview
         this.action = action as ShootAction;
         this.controller = controller as ShootActionController;
         instance = Instantiate(display,this.controller.rotationPoint.position,Quaternion.identity);
-        instance.SetArc(Vector2.right, 0, this.action.range, this.action.bulletSpread);
+        instance.SetDisplayTarget(Vector2.right, 0, this.action.range, this.action.bulletSpread);
     }
 
     public override void Clear()
@@ -28,8 +28,13 @@ public class MultiShotPreview : ActionPreview
         //Detach logic
     }
 
+    public override ActionPreviewDisplay GetPreviewDisplay()
+    {
+        return instance;
+    }
+
     public override void UpdateView(Vector2 location)
     {
-        instance.SetArc((location - (Vector2)controller.rotationPoint.position).normalized, 0, action.range, action.bulletSpread);
+        instance.SetDisplayTarget((location - (Vector2)controller.rotationPoint.position).normalized, 0, action.range, action.bulletSpread);
     }
 }

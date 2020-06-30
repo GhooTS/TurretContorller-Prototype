@@ -37,4 +37,9 @@ public class PreciseShotPreview : ActionPreview
 
         instance.SetDisplayTarget(startPoint,location);
     }
+
+    public override ActionPreviewDisplay GetPreviewDisplay()
+    {
+        return instance;
+    }
 }
