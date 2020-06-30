@@ -11,5 +11,6 @@ public abstract class ActionController : MonoBehaviour
 
     public abstract void Execute(Action action,ActionTarget actionTarget);
     public abstract bool HasFinshed();
+    public abstract Vector2 GetActionStartPosition(Vector2 target);
 }
 

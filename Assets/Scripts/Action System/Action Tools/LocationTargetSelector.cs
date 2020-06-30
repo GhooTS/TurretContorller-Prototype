@@ -40,6 +40,8 @@ public class LocationTargetSelector : MonoBehaviour
 
     public void Applay()
     {
+        var startPosition = actionContainer.controller.GetActionStartPosition(location);
+        location = startPosition + (location - startPosition).normalized * actionContainer.action.range;
         actionSource.EnqueueAction(actionContainer.GetQueuedAction(new ActionTarget { targetLocation = location }));
         Deactivate();
         targetSelected?.Invoke();

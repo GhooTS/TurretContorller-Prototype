@@ -12,6 +12,15 @@ public class ShootActionController : ActionController
     private Vector2 currentTarget; 
     private float nextShootTime = 0;
     private int bulletsLeft = 0;
+    /// <summary>
+    /// Distance from rotation point to the spawn point
+    /// </summary>
+    public float SpawnPointDistance { get; private set; }
+
+    private void Start()
+    {
+        SpawnPointDistance = Vector2.Distance(rotationPoint.position, bulletSpawnPoint.position);
+    }
 
     private void Update()
     {
@@ -72,6 +81,12 @@ public class ShootActionController : ActionController
         instance.Shoot(direction);
         bulletsLeft--;
         nextShootTime = Time.time + currentAction.fireRate;
+    }
+
+    public override Vector2 GetActionStartPosition(Vector2 target)
+    {
+        Vector2 rotPointPosition = rotationPoint.position; 
+        return rotPointPosition + SpawnPointDistance * (target - rotPointPosition).normalized;
     }
 }
 
