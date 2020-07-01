@@ -11,7 +11,7 @@ public class ShootAction : Action
     }
 
     public ShotType shotType;
-    public Bullet bulletPrefab;
+    public ParticleProjectileController prefab;
     public float fireRate = 0.2f; // How fast turret shoots
     public float bulletSpread = 12f; // in degrees
     public int numberOfShoots = 3; // How much bullets turret shoot in one action
