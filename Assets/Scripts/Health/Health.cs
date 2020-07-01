@@ -1,9 +1,7 @@
 ﻿using GTVariable;
 using UnityEngine;
 using UnityEngine.Events;
-
-
-public class Health : MonoBehaviour
+public class Health : MonoBehaviour,IDamageable
 {
     [Tooltip("Whether or not take action when hp hit 0")]
     public bool autoDestroy = true;
