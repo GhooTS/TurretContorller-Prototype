@@ -21,8 +21,7 @@ MonoBehaviour:
   targetKind: 0
   range: 13
   shotType: 0
-  bulletPrefab: {fileID: 7898060683038982000, guid: b886655d614ed1f4f8200fd2afd50879,
-    type: 3}
+  prefab: {fileID: 5531379997448752182, guid: df1117fdadd9fa641a35c6b7d2d7df76, type: 3}
   fireRate: 0.1
   bulletSpread: 1
   numberOfShoots: 1
