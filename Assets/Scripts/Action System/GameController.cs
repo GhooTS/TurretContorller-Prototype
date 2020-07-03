@@ -5,6 +5,18 @@ public class GameController : MonoBehaviour
 {
     public UnitQueueExecutor unitQueue;
     public CameraController cameraController;
+    public Animator GameStateAnimator;
+    private int inCycleHash;
+
+    private void Start()
+    {
+        inCycleHash = Animator.StringToHash("InCycle");
+    }
+
+    private void OnEnable()
+    {
+        
+    }
 
     private void Update()
     {
@@ -26,6 +38,13 @@ public class GameController : MonoBehaviour
         }
     }
 
+
+    public void SwitchGameState()
+    {
+        GameStateAnimator.SetBool(inCycleHash,unitQueue.InCycle);
+        Debug.Log(unitQueue.InCycle);
+    }
+
     private void StartCameraTransition()
     {
         StartCoroutine(WaitForCameraTransition());
@@ -35,14 +54,7 @@ public class GameController : MonoBehaviour
     {
         if (unitQueue.HasAction())
         {
-            if (unitQueue.CurrentActive.TryGetComponent(out GameObjectBounds bounds)) 
-            {
-                cameraController.StartTransition(bounds, unitQueue.GetCurrentTarget());
-            }
-            else
-            {
-                cameraController.StartTransition(unitQueue.GetCurrentSource(), unitQueue.GetCurrentTarget());
-            }
+            cameraController.StartTransition(unitQueue.CurrentActive.transform, unitQueue.GetCurrentTarget());
         }
         else if(unitQueue.HasReaction())
         {
