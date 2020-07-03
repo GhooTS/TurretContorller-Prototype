@@ -49,15 +49,15 @@ MonoBehaviour:
   display: {fileID: 7484718106739761581}
   normal:
     useConstant: 1
-    constantValue: {r: 1, g: 1, b: 1, a: 0.101960786}
+    constantValue: {r: 1, g: 1, b: 1, a: 0.03137255}
     variable: {fileID: 0}
   focus:
     useConstant: 1
-    constantValue: {r: 0.37254903, g: 0.87843144, b: 1, a: 0.101960786}
+    constantValue: {r: 0.37254903, g: 0.87843144, b: 1, a: 0.03137255}
     variable: {fileID: 0}
   active:
     useConstant: 1
-    constantValue: {r: 0.3726415, g: 0.87944883, b: 1, a: 0.2509804}
+    constantValue: {r: 0.3726415, g: 0.87944883, b: 1, a: 0.101960786}
     variable: {fileID: 0}
 --- !u!114 &7484718106739761581
 MonoBehaviour:
