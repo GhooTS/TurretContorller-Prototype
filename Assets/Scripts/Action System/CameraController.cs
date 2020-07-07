@@ -1,69 +1,86 @@
 ﻿using UnityEngine;
-using GTCamera2D;
+using Cinemachine;
+using System.Collections.Generic;
+
 
 public class CameraController : MonoBehaviour
 {
-    new public Camera camera;
-    public CameraFreeLook freeCamera;
-    public CameraMultiTargetFollow actionCamera;
+    public CinemachineTargetGroup targetGroup;
     public float transitionTime = 1f;
-    private SizeBounds actionSource;
-    private SizeBounds target;
+    private readonly List<Transform> targets = new List<Transform>(2);
+    private Transform FirstTarget { get { return targets[0]; } }
+    private Transform SecoundTarget { get { return targets[1]; } }
 
     private void Awake()
     {
-        actionSource = new GameObject("Action Source", typeof(SizeBounds)).GetComponent<SizeBounds>();
-        actionSource.size = new Rect(0f, 0f, 2f, 2f);
-        target = new GameObject("Target", typeof(SizeBounds)).GetComponent<SizeBounds>();
-        target.size = new Rect(0f, 0f, 2f, 2f);
+        targets.Add(new GameObject("Source").transform);
+        targets.Add(new GameObject("Target").transform);
+        FirstTarget.hideFlags = HideFlags.HideInHierarchy;
+        SecoundTarget.hideFlags = HideFlags.HideInHierarchy;
     }
 
-    public void SwitchToFreeCamera()
+    private void AddTarget(Vector2 target)
     {
-        freeCamera.enabled = true;
-        actionCamera.enabled = false;
+        FirstTarget.position = target;
+        targetGroup.AddMember(FirstTarget, 1,0);
     }
 
-    public void SwitchToActionCamera()
+    private void AddTarget(Vector2 firstTarget, Vector2 secoundTarget)
     {
-        freeCamera.enabled = false;
-        actionCamera.enabled = true;
+        FirstTarget.position = firstTarget;
+        targetGroup.AddMember(FirstTarget, 1, 0);
+        SecoundTarget.position = secoundTarget;
+        targetGroup.AddMember(SecoundTarget, 1, 0);
     }
 
-    public void StartTransition(Vector2 source,Vector2 targetLocation)
+    private void AddTarget(Transform target)
     {
-        actionCamera.ClearAllTargets();
-        actionSource.transform.position = source;
-        actionCamera.AddTarget(actionSource);
-        target.transform.position = targetLocation;
-        actionCamera.AddTarget(target);
+        targets.Add(target);
+        targetGroup.AddMember(target, 1, 0);
     }
 
-    public void StartTransition(Vector2 source)
+    private void Clear()
     {
-        actionCamera.ClearAllTargets();
-        actionSource.transform.position = source;
-        actionCamera.AddTarget(actionSource);
+        for (int i = targets.Count - 1; i >= 0; i--)
+        {
+            targetGroup.RemoveMember(targets[i]);
+            if (i > 1)
+            {
+                targets.RemoveAt(i);
+            }
+        }
     }
 
-    public void StartTransition(GameObjectBounds source, Vector2 targetLocation)
+    public void StartTransition(Vector2 sourceLocation,Vector2 targetLocation)
     {
-        actionCamera.ClearAllTargets();
-        actionCamera.AddTarget(source);
-        target.transform.position = targetLocation;
-        actionCamera.AddTarget(target);
+        Clear();
+        AddTarget(sourceLocation,targetLocation);
     }
 
-    public void StartTransition(GameObjectBounds source, GameObjectBounds target)
+
+    public void StartTransition(Transform source, Vector2 targetLocation)
     {
-        actionCamera.ClearAllTargets();
-        actionCamera.AddTarget(source);
-        actionCamera.AddTarget(target);
+        Clear();
+        AddTarget(source);
+        AddTarget(targetLocation);
+    }
+
+    public void StartTransition(Transform source, Transform target)
+    {
+        Clear();
+        AddTarget(source);
+        AddTarget(target);
+    }
+
+    public void StartTransition(Vector2 sourceLocation)
+    {
+        Clear();
+        AddTarget(sourceLocation);
     }
 
     public void StartTransition(Transform source)
     {
-        actionCamera.ClearAllTargets();
-        actionCamera.AddTarget(source.GetComponent<GameObjectBounds>());
+        Clear();
+        AddTarget(source);
     }
 }
