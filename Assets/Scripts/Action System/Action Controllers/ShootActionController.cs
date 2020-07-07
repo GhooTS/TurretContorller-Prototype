@@ -5,6 +5,7 @@ public class ShootActionController : ActionController
 {
     public Transform bulletSpawnPoint;
     public Transform rotationPoint;
+    public Collider2D barrelCollider;
     public float rotationSpeed = 10f; // How fast turret rotate
 
     private ShootAction currentAction;
@@ -16,7 +17,7 @@ public class ShootActionController : ActionController
     /// Distance from rotation point to the spawn point
     /// </summary>
     public float SpawnPointDistance { get; private set; }
-    private float bulletTravelTime;
+    private ParticleProjectileController instance;
 
     private void Start()
     {
@@ -54,36 +55,45 @@ public class ShootActionController : ActionController
         active = true;
         nextShootTime = 0;
         bulletsLeft = currentAction.numberOfShoots;
-        bulletTravelTime = currentAction.range / (currentAction.bulletPrefab.speed * Time.fixedDeltaTime);
     }
 
     public override bool HasFinshed()
     {
-        return active == false;
+
+        if(active == false && instance != null && instance.IsPlaying() == false)
+        {
+            //Enable barrel collider
+            if(barrelCollider != null) barrelCollider.enabled = true;
+
+            Destroy(instance.gameObject);
+            return true;
+        }
+
+        return false;
     }
 
 
     private void Shoot()
     {
-        var direction = (currentTarget - (Vector2)rotationPoint.position).normalized;
-        Quaternion bulletRotation = rotationPoint.rotation;
-
-        if (currentAction.shotType == ShootAction.ShotType.MultiShot)
+        if (FirstShot())//Spawn Instance before first shot
         {
-            var newShootAngle = rotationPoint.eulerAngles.z + Random.Range(0f, currentAction.bulletSpread) * (Random.value <= .5f ? -1 : 1);
-            direction.x = Mathf.Cos(newShootAngle * Mathf.Deg2Rad);
-            direction.y = Mathf.Sin(newShootAngle * Mathf.Deg2Rad);
-            bulletRotation = Quaternion.Euler(0, 0, newShootAngle);
-        }
-        
+            //Disable barrel collider
+            if (barrelCollider != null) barrelCollider.enabled = false;
 
-        var instance = Instantiate(currentAction.bulletPrefab, bulletSpawnPoint.position, bulletRotation);
-        //Will only work if Shoot Action component is on same gameobject as Collider component
-        instance.source = gameObject;
-        instance.Shoot(direction);
-        Destroy(instance.gameObject, bulletTravelTime);
+            instance = Instantiate(currentAction.prefab, bulletSpawnPoint.position, rotationPoint.localRotation);
+            instance.range = currentAction.range;
+            instance.bulletsSpread = currentAction.bulletSpread;
+            instance.bulletSpeed = 25f;
+            instance.Init();
+        }
+        instance.Shoot();
         bulletsLeft--;
         nextShootTime = Time.time + currentAction.fireRate;
+    }
+
+    private bool FirstShot()
+    {
+        return currentAction != null && currentAction.numberOfShoots - bulletsLeft == 0;
     }
 
     public override Vector2 GetActionStartPosition(Vector2 target)

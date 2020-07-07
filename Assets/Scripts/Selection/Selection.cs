@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class Selection : MonoBehaviour
 {
-    public Selectable selected;
+    public GameObject selected;
     public UnityEvent OnSelected;
     public UnityEvent OnDiselected;
     public LayerMask selectionLayer;
@@ -41,7 +41,7 @@ public class Selection : MonoBehaviour
         var hit = Physics2D.Raycast(mousePosition, Vector2.zero,Mathf.Infinity,selectionLayer);
         if (hit.collider != null && hit.collider.TryGetComponent(out Selectable selected))
         {
-            this.selected = selected;
+            this.selected = selected.root;
             OnSelected?.Invoke();
         }
     }
